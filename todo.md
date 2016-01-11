@@ -1,10 +1,19 @@
-# Language Features
+Overview
+========
+
+This document contains what I want to achieve with this language. The goals are high, but I will
+start with small pieces.
+
+Pieces of this document will later be migrated to both a more technical specification and a more
+user-friendly documentation.
+
+Language Features
+-----------------
 
 The following originates from best practices and can be considered a wishlist of what I would
 like to see combined in a single programming language.
 
-- strong, static typing
-- type inference
+- strong, static typing with type inference
 - expressions over statements, everything returns a value
 - immutable over mutable
 - infix notation
@@ -23,7 +32,8 @@ like to see combined in a single programming language.
 - implicit parameters
 - intelligent string interpolation
 
-# Syntax Sucks
+Syntax Sucks
+------------
 
 Everyone likes to read code in a different way. Some prefer `fun` for function definitions, some
 `def`. Some prefer tabs, some prefer two or four spaces.
@@ -36,15 +46,15 @@ designed web page can render in your personal preference.
 Allowing multiple keywords is no problem to me. Keywords are rare and common enough to not be used
 as identifiers anyway.
 
-## Semicolons
+### Semicolons
 
 Semicolons are optional. The compiler can figure out when an expression ends.
 
-## Spaces or Tabs
+### Spaces or Tabs
 
 Spaces versus tabs is one of the most stupid discussions ever.
 
-## Definitions
+### Definitions
 
 `val foo = ...` is the same as `let foo = ...`.
 
@@ -52,25 +62,25 @@ Spaces versus tabs is one of the most stupid discussions ever.
 
 `def foo = ...` is the same as `fn foo = ...` is the same as `fun foo = ...`.
 
-## Calling Methods
+### Calling Methods
 
 `Foo.run()` is the same as `Foo::run()`.
 
-## Creating Things / Constructor
+### Creating Things / Constructor
 
 `new Foo()` is the same as `Foo::new()`.
 
-## Camel vs Underscores
+### Camel vs Underscores
 
 `Foo.doStuff()` is the same as `Foo::do_stuff()`.
 
-## Namespacing
+### Namespacing
 
 `import stuff`, `include stuff` and `use stuff` are all the same.
 
 Also, `import stuff.util` is the same as `import stuff::util`.
 
-## Comments
+### Comments
 
 All of these are comments:
 
@@ -80,7 +90,7 @@ All of these are comments:
 
     /* foo comment */
 
-## Using Methods / Functions
+### Using Methods / Functions
 
 Both add the `add` method to `Thing`:
 
@@ -93,7 +103,7 @@ Both add the `add` method to `Thing`:
 They can both be used as `add(thing, number)`, `thing.add(number)` and with infix notation
 `thing add number`.
 
-# Returning Multiple Values
+## Returning Multiple Values
 
 Definition:
 
