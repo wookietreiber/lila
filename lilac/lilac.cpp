@@ -6,19 +6,13 @@
 \*                    |/                                                */
 
 #include <fstream>
+#include <iostream>
 
-#include "lexer.hpp"
+#include "parser.hpp"
 
-using namespace std;
-
-using namespace lila::lexer;
+using namespace lila::parser;
 
 int main(int argc, char** argv) {
-
-  /*
-    file stream -> lexed stream -> ast stream
-   */
-
   vector<unique_ptr<Token>> tokens;
 
   if (argc == 1) {
@@ -39,8 +33,21 @@ int main(int argc, char** argv) {
 
   for (auto it = tokens.begin() ; it != tokens.end(); ++it) {
     Token * token = (*it).get();
-    cout << "[debug] [token] \"" << token->toString().c_str() << "\"" << endl;
+    cerr << "[debug] [token] \"" << token->toString().c_str() << "\"" << endl;
   }
+
+  Parser parser(&tokens);
+
+  unique_ptr<ASTNode> ast;
+
+  try {
+    ast = parser.parse();
+  } catch (const char * msg) {
+    cerr << msg << endl;
+    return 1;
+  }
+
+  cerr << "ast: " << (*ast).toString() << endl;
 
   return 0;
 }

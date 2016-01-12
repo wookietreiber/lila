@@ -7,6 +7,8 @@
 
 #include "lexer.hpp"
 
+#include <istream>
+
 namespace lila {
   namespace lexer {
 
