@@ -18,17 +18,16 @@ namespace lila {
     class ASTNode {
     public:
       virtual string toString() = 0;
+      virtual ~ASTNode() {}
     };
 
     class ExprAST : public ASTNode {
-    public:
-      virtual ~ExprAST() {}
     };
 
     class NumberExprAST : public ExprAST {
-      double Val;
 
     public:
+      double Val;
       NumberExprAST(double Val) : Val(Val) {}
       string toString() {
         return to_string(Val);
@@ -36,10 +35,10 @@ namespace lila {
     };
 
     class BinaryExprAST : public ExprAST {
-      string Op;
-      unique_ptr<ExprAST> LHS, RHS;
 
     public:
+      string Op;
+      unique_ptr<ExprAST> LHS, RHS;
       BinaryExprAST(string Op, unique_ptr<ExprAST> LHS, unique_ptr<ExprAST> RHS)
         : Op(Op), LHS(move(LHS)), RHS(move(RHS)) {}
       string toString() {

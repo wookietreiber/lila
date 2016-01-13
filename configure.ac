@@ -3,7 +3,6 @@
 
 AC_PREREQ([2.69])
 AC_INIT([lila], [0.1.0], [https://github.com/wookietreiber/lila/issues])
-AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_SRCDIR([lilac/lilac.cpp])
 AC_CONFIG_HEADERS([config.h])
 

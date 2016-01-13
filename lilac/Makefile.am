@@ -1,9 +1,13 @@
+AM_CXXFLAGS = -Wall -pedantic -std=c++14 -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS
+
 bin_PROGRAMS = lilac
 
-lilac_CXXFLAGS = -ferror-limit=5 -std=c++14
+lilac_LDADD = -lLLVMCore -lLLVMSupport -lrt -ldl -lcurses -lpthread -lz -lm
 
 lilac_SOURCES = \
 	ast.hpp \
+	codegen.hpp \
+	codegen.cpp \
 	lexer.hpp \
 	lexer.cpp \
 	parser.hpp \
