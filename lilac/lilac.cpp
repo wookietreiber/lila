@@ -39,7 +39,7 @@ int main(int argc, char** argv) {
   }
 
   for (auto it = tokens.begin() ; it != tokens.end(); ++it) {
-    Token * token = (*it).get();
+    Token * token = it->get();
     cerr << "[debug] [token] \"" << token->toString().c_str() << "\"" << endl;
   }
 
@@ -58,7 +58,7 @@ int main(int argc, char** argv) {
     return 1;
   }
 
-  cerr << "[debug] [ast] " << (*ast).toString() << endl;
+  cerr << "[debug] [ast] " << ast->toString() << endl;
 
   // ---------------------------------------------------------------------------
   // generate LLVM IR code

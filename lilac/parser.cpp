@@ -19,7 +19,7 @@ namespace lila {
     unique_ptr<ExprAST> Parser::parseBinOpRHS(unique_ptr<ExprAST> lhs, int prec) {
       while (curtok) {
         // expecting some op token
-        if (auto op = dynamic_cast<OtherToken*>(&(*curtok))) {
+        if (auto op = dynamic_cast<OtherToken*>(curtok.get())) {
           int opprec = getPrecedence(op->value);
 
           if (opprec < prec)
@@ -41,7 +41,7 @@ namespace lila {
 
           // if op binds less tightly with rhs than op after rhs, let
           // the pending op take rhs as its lhs
-          if (auto nextop = dynamic_cast<OtherToken*>(&(*curtok))) {
+          if (auto nextop = dynamic_cast<OtherToken*>(curtok.get())) {
             int nextprec = getPrecedence(nextop->value);
 
             if (opprec < nextprec) {
@@ -64,7 +64,7 @@ namespace lila {
     }
 
     unique_ptr<ExprAST> Parser::parsePrimary() {
-      if (auto t = dynamic_cast<NumberToken*>(&(*curtok))) {
+      if (auto t = dynamic_cast<NumberToken*>(curtok.get())) {
         return parseNumberExpr(t);
       } else {
         throw "unknown token when expecting an expression";

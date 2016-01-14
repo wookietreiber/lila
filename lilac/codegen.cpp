@@ -15,17 +15,17 @@ namespace lila {
     }
 
     llvm::Value* CodeGen::generateCodeExpr(ExprAST *ast) {
-      if (auto x = dynamic_cast<NumberExprAST*>(&(*ast))) {
+      if (auto x = dynamic_cast<NumberExprAST*>(ast)) {
         return generateCodeNumber(x);
-      } else if (auto x = dynamic_cast<BinaryExprAST*>(&(*ast))) {
+      } else if (auto x = dynamic_cast<BinaryExprAST*>(ast)) {
         return generateCodeBinOp(x);
       } else
         throw "oops";
     }
 
     llvm::Value* CodeGen::generateCodeBinOp(BinaryExprAST *ast) {
-      llvm::Value *L = generateCodeExpr(&(*ast->LHS));
-      llvm::Value *R = generateCodeExpr(&(*ast->RHS));
+      llvm::Value *L = generateCodeExpr(ast->LHS.get());
+      llvm::Value *R = generateCodeExpr(ast->RHS.get());
 
       if (!L || !R)
         return nullptr;
@@ -95,9 +95,9 @@ namespace lila {
     }
 
     void CodeGen::generateCode(unique_ptr<ASTNode> ast) {
-      if (auto x = dynamic_cast<NumberExprAST*>(&(*ast))) {
+      if (auto x = dynamic_cast<NumberExprAST*>(ast.get())) {
         wrapInMain(generateCodeNumber(x));
-      } else if (auto x = dynamic_cast<BinaryExprAST*>(&(*ast))) {
+      } else if (auto x = dynamic_cast<BinaryExprAST*>(ast.get())) {
         wrapInMain(generateCodeBinOp(x));
       } else
         throw "can't handle ast";

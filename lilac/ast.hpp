@@ -42,7 +42,7 @@ namespace lila {
       BinaryExprAST(string Op, unique_ptr<ExprAST> LHS, unique_ptr<ExprAST> RHS)
         : Op(Op), LHS(move(LHS)), RHS(move(RHS)) {}
       string toString() {
-        return '(' + (*LHS).toString() + ' ' + Op + ' ' + (*RHS).toString() + ')';
+        return '(' + LHS->toString() + ' ' + Op + ' ' + RHS->toString() + ')';
       }
     };
 
