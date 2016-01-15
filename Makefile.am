@@ -1,1 +1,1 @@
-SUBDIRS = lilac
+SUBDIRS = lilac test

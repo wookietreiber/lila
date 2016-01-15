@@ -9,3 +9,4 @@ depcomp
 config.h.in
 autom4te.cache/
 configure.scan
+test-driver

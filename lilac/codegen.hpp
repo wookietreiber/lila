@@ -45,6 +45,10 @@ namespace lila {
       void wrapInMain(llvm::Value *code);
 
       void generateCode(unique_ptr<ASTNode> ast);
+
+      virtual ~CodeGen() {
+        delete Builder;
+      }
     };
 
   }

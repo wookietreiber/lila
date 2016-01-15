@@ -22,5 +22,6 @@ AC_PROG_CXX
 AC_FUNC_STRTOD
 
 AC_CONFIG_FILES([Makefile
-                 lilac/Makefile])
+                 lilac/Makefile
+                 test/Makefile])
 AC_OUTPUT
