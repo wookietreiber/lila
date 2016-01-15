@@ -8,6 +8,10 @@
 #include <fstream>
 #include <iostream>
 
+#include <llvm/Support/raw_ostream.h>
+#include <llvm/Support/FileSystem.h>
+#include <llvm/Bitcode/ReaderWriter.h>
+
 #include "codegen.hpp"
 #include "parser.hpp"
 
@@ -68,7 +72,19 @@ int main(int argc, char** argv) {
 
   codegen.generateCode(move(ast));
 
-  codegen.module->dump();
+  // ---------------------------------------------------------------------------
+  // write LLVM  IR code
+  // ---------------------------------------------------------------------------
+
+  std::error_code ec;
+  std::error_condition ok;
+  llvm::raw_fd_ostream out("anonymous.bc", ec, llvm::sys::fs::F_None);
+  if (0 != ec.value()) {
+    cerr << "error: " << ec.message() << endl;
+    return ec.value();
+  }
+
+  llvm::WriteBitcodeToFile(codegen.module.get(), out);
 
   // ---------------------------------------------------------------------------
   // end
