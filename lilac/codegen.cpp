@@ -33,11 +33,11 @@ namespace lila {
       string op = ast->Op;
 
       if (op == "+") {
-        return Builder->CreateFAdd(L, R, "addtmp");
+        return Builder.CreateFAdd(L, R, "addtmp");
       } else if (op == "-") {
-        return Builder->CreateFSub(L, R, "subtmp");
+        return Builder.CreateFSub(L, R, "subtmp");
       } else if (op == "*") {
-        return Builder->CreateFMul(L, R, "multmp");
+        return Builder.CreateFMul(L, R, "multmp");
       } else {
         throw "unknown operator";
       }
@@ -55,39 +55,39 @@ namespace lila {
 
       // Create a new basic block to start insertion into.
       llvm::BasicBlock *BB = llvm::BasicBlock::Create(context, "entry", TheFunction);
-      Builder->SetInsertPoint(BB);
+      Builder.SetInsertPoint(BB);
 
-      Builder->CreateRet(code);
+      Builder.CreateRet(code);
 
       // generate void main()
-      llvm::FunctionType *voidType = llvm::FunctionType::get(Builder->getVoidTy(), false);
+      llvm::FunctionType *voidType = llvm::FunctionType::get(Builder.getVoidTy(), false);
       llvm::Function *mainFunc =
         llvm::Function::Create(voidType, llvm::Function::ExternalLinkage, "main", module.get());
 
       llvm::BasicBlock *MainBlock = llvm::BasicBlock::Create(context, "mainentry1", mainFunc);
-      Builder->SetInsertPoint(MainBlock);
+      Builder.SetInsertPoint(MainBlock);
 
       // call the function inside main
       std::vector<llvm::Value *> ArgsV;
 
-      auto bippy = Builder->CreateCall(TheFunction, ArgsV, "calltmp");
+      auto bippy = Builder.CreateCall(TheFunction, ArgsV, "calltmp");
 
-      llvm::Value *fmt = Builder->CreateGlobalStringPtr("%f\n");
+      llvm::Value *fmt = Builder.CreateGlobalStringPtr("%f\n");
 
       vector<llvm::Type *> putsArgs;
-      putsArgs.push_back(Builder->getInt8Ty()->getPointerTo());
+      putsArgs.push_back(Builder.getInt8Ty()->getPointerTo());
       llvm::ArrayRef<llvm::Type*> argsRef(putsArgs);
 
       llvm::FunctionType *putsType =
-        llvm::FunctionType::get(Builder->getInt32Ty(), argsRef, true);
+        llvm::FunctionType::get(Builder.getInt32Ty(), argsRef, true);
       llvm::Constant *putsFunc = module->getOrInsertFunction("printf", putsType);
 
       vector<llvm::Value *> CallArgs;
       CallArgs.push_back(fmt);
       CallArgs.push_back(bippy);
-      Builder->CreateCall(putsFunc, CallArgs, "oo");
+      Builder.CreateCall(putsFunc, CallArgs, "oo");
 
-      Builder->CreateRetVoid();
+      Builder.CreateRetVoid();
 
       // Validate the generated code, checking for consistency.
       verifyFunction(*TheFunction);

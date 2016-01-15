@@ -54,7 +54,7 @@ namespace lila {
       unique_ptr<ExprAST> parseBinOpRHS(unique_ptr<ExprAST> lhs, int prec);
 
     public:
-      Parser(vector<unique_ptr<Token>>* tokens) : tokens(tokens) {
+      explicit Parser(vector<unique_ptr<Token>>* tokens) : tokens(tokens) {
         operatorPrecendences["+"] = 20;
         operatorPrecendences["-"] = 20;
         operatorPrecendences["*"] = 40;

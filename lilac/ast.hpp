@@ -28,7 +28,7 @@ namespace lila {
 
     public:
       double Val;
-      NumberExprAST(double Val) : Val(Val) {}
+      explicit NumberExprAST(double Val) : Val(Val) {}
       string toString() {
         return to_string(Val);
       }

@@ -29,13 +29,14 @@ namespace lila {
 
     class CodeGen {
       llvm::LLVMContext& context;
-      llvm::IRBuilder<> *Builder;
+      llvm::IRBuilder<> Builder;
 
     public:
       unique_ptr<llvm::Module> module;
-      CodeGen(string modulename, llvm::LLVMContext& ctx) : context(ctx) {
+
+      CodeGen(string modulename, llvm::LLVMContext& ctx)
+        : context(ctx), Builder(llvm::IRBuilder<>(ctx)) {
         module = llvm::make_unique<llvm::Module>(modulename, context);
-        Builder = new llvm::IRBuilder<>(context);
       }
 
       llvm::Value * generateCodeExpr(ExprAST *ast);
@@ -45,10 +46,6 @@ namespace lila {
       void wrapInMain(llvm::Value *code);
 
       void generateCode(unique_ptr<ASTNode> ast);
-
-      virtual ~CodeGen() {
-        delete Builder;
-      }
     };
 
   }

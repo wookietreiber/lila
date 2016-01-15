@@ -77,7 +77,6 @@ int main(int argc, char** argv) {
   // ---------------------------------------------------------------------------
 
   std::error_code ec;
-  std::error_condition ok;
   llvm::raw_fd_ostream out("anonymous.bc", ec, llvm::sys::fs::F_None);
   if (0 != ec.value()) {
     cerr << "error: " << ec.message() << endl;
