@@ -9,7 +9,7 @@ if which valgrind &> /dev/null ; then
 
   # TODO add --show-leak-kinds=all when travis gets newer valgrind
   valgrind --tool=memcheck --leak-check=full --track-origins=yes --error-exitcode=1 \
-    $LILAC <<< '42' \
+    $LILAC -o /dev/null <<< '42' \
       2> $MEMCHECK_OUT
 
   VALGRIND_EXIT_STATUS=$?
