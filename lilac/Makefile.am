@@ -2,7 +2,7 @@ AM_CXXFLAGS = -Wall -pedantic -std=c++14 -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT
 
 bin_PROGRAMS = lilac
 
-lilac_LDADD = -lLLVMCore -lLLVMSupport -lLLVMBitWriter -lrt -ldl -lcurses -lpthread -lz -lm
+lilac_LDADD = -lLLVM
 
 lilac_SOURCES = \
 	ast.hpp \
