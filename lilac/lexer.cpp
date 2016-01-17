@@ -7,8 +7,6 @@
 
 #include "lexer.hpp"
 
-#include <istream>
-
 namespace lila {
   namespace lexer {
 
@@ -28,7 +26,7 @@ namespace lila {
           } while (isdigit(c));
 
           double value = strtod(number.c_str(), nullptr);
-          auto numberToken = make_unique<NumberToken>(value);
+          auto numberToken = llvm::make_unique<NumberToken>(value);
           tokens->push_back(move(numberToken));
 
         } else { // other token
@@ -39,7 +37,7 @@ namespace lila {
             is->get(c);
           } while (!isspace(c));
 
-          auto otherToken = make_unique<OtherToken>(str);
+          auto otherToken = llvm::make_unique<OtherToken>(str);
           tokens->push_back(move(otherToken));
         }
       }

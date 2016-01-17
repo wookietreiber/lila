@@ -12,7 +12,7 @@ namespace lila {
 
     unique_ptr<ExprAST> Parser::parseNumberExpr(NumberToken* tok) {
       double number = tok->value;
-      auto numberast = make_unique<NumberExprAST>(number);
+      auto numberast = llvm::make_unique<NumberExprAST>(number);
       return move(numberast);
     }
 
@@ -37,7 +37,7 @@ namespace lila {
           nextToken();
 
           if (!curtok)
-            return make_unique<BinaryExprAST>(op->value, move(lhs), move(rhs));
+            return llvm::make_unique<BinaryExprAST>(op->value, move(lhs), move(rhs));
 
           // if op binds less tightly with rhs than op after rhs, let
           // the pending op take rhs as its lhs
@@ -52,7 +52,7 @@ namespace lila {
             }
 
             // Merge lhs/rhs.
-            lhs = make_unique<BinaryExprAST>(op->value, move(lhs), move(rhs));
+            lhs = llvm::make_unique<BinaryExprAST>(op->value, move(lhs), move(rhs));
           }
 
         } else {

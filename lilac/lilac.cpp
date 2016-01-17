@@ -97,7 +97,7 @@ int main(int argc, char** argv) {
   if (verbose)
     for (auto it = tokens.begin() ; it != tokens.end(); ++it) {
       Token * token = it->get();
-      cerr << "[debug] [token] \"" << token->toString().c_str() << "\"" << endl;
+      cerr << "[debug] [token] \"" << token->toString() << "\"" << endl;
     }
 
   // ---------------------------------------------------------------------------
@@ -127,13 +127,14 @@ int main(int argc, char** argv) {
   codegen.generateCode(move(ast));
 
   // ---------------------------------------------------------------------------
-  // write LLVM  IR code
+  // write LLVM IR code
   // ---------------------------------------------------------------------------
 
   std::error_code ec;
   llvm::raw_fd_ostream out(output, ec, llvm::sys::fs::F_None);
-  if (0 != ec.value()) {
-    cerr << "error: " << ec.message() << endl;
+
+  if (ec) {
+    cerr << "error: " << output << ": " << ec.message() << endl;
     return ec.value();
   }
 

@@ -17,6 +17,7 @@ AC_PROG_CXX
 # Checks for header files.
 
 # Checks for typedefs, structures, and compiler characteristics.
+AC_CHECK_HEADER_STDBOOL
 
 # Checks for library functions.
 AC_FUNC_STRTOD

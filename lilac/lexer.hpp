@@ -8,8 +8,7 @@
 #ifndef LILA_LEXER_H
 #define LILA_LEXER_H
 
-#include <memory>
-#include <vector>
+#include <llvm/ADT/STLExtras.h>
 
 #include "token.hpp"
 
