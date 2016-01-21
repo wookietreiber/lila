@@ -7,8 +7,8 @@ start with small pieces.
 Pieces of this document will later be migrated to both a more technical specification and a more
 user-friendly documentation.
 
-Language Features
------------------
+Features
+--------
 
 The following originates from best practices and can be considered a wishlist of what I would
 like to see combined in a single programming language.
@@ -24,13 +24,34 @@ like to see combined in a single programming language.
 - typeclasses
 - small, yet extensible language, allow to do a lot as library
 - compiled to binary
-- scales from interpreted scripts (`#!/usr/bin/env interpreter`) to large projects
+- scales from interpreted scripts (`#!/usr/bin/env lila`) to large projects
 - repl
 - supports both low-level (machine-near) stuff as well as high-level abstractions
 - building high-level abstractions serves code organization, compiler should be able to deconstruct
   into low-level, no/low overhead machine code
 - implicit parameters
 - intelligent string interpolation
+
+Infrastructure
+--------------
+
+### Program: lila
+
+- interactive interpreter (repl)
+- interpreter for scripts with shebang `#!/usr/bin/env lila`
+
+### Program: lilac
+
+- compiler
+- linker
+
+### Linking
+
+- `-c` option to compile only, not link
+- also link without a `-c` option
+- native linker vs llvm linker
+- `-l` option, `LDFLAGS`
+- `-L` option, `LD_LIBRARY_PATH`
 
 Syntax Sucks
 ------------
