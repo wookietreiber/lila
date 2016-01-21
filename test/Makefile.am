@@ -1,4 +1,5 @@
 TESTS = \
+	lila-memcheck.sh \
 	lilac-memcheck.sh
 
 EXTRA_DIST = $(TESTS)

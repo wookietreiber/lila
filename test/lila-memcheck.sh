@@ -5,14 +5,14 @@ if ! which valgrind &> /dev/null ; then
   exit 77
 fi
 
-LILAC=../lilac/lilac
+LILA=../lilac/lila
 
 MEMCHECK_OUT=$(mktemp)
 
 trap "rm -f $MEMCHECK_OUT" EXIT
 
 valgrind --tool=memcheck --leak-check=full --track-origins=yes --error-exitcode=1 \
-  $LILAC -o /dev/null <<< '42' \
+  $LILA < /dev/null \
     2> $MEMCHECK_OUT
 
 VALGRIND_EXIT_STATUS=$?
