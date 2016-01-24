@@ -1,4 +1,5 @@
 TESTS = \
+	lilac-simple.sh \
 	lila-memcheck.sh \
 	lilac-memcheck.sh
 
