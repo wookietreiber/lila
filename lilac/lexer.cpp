@@ -13,17 +13,16 @@ namespace lila {
     int tokenize(basic_istream<char>* is, vector<unique_ptr<Token>>* tokens) {
       char c;
 
-      while (is->get(c)) {
+      while (is && is->get(c)) {
         if (isspace(c))
           continue;
 
         if (isdigit(c)) { // Number: [0-9]+
           string number;
+          number += c;
 
-          do {
+          while (is && is->get(c) && isdigit(c))
             number += c;
-            is->get(c);
-          } while (isdigit(c));
 
           double value = strtod(number.c_str(), nullptr);
           auto numberToken = llvm::make_unique<NumberToken>(value);
@@ -31,11 +30,10 @@ namespace lila {
 
         } else { // other token
           string str;
+          str += c;
 
-          do {
+          while (is && is->get(c) && !isspace(c))
             str += c;
-            is->get(c);
-          } while (!isspace(c));
 
           auto otherToken = llvm::make_unique<OtherToken>(str);
           tokens->push_back(move(otherToken));
