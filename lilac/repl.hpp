@@ -5,17 +5,26 @@
 **  /____//_//____/_/ | |                                               **
 \*                    |/                                                */
 
-#include <iostream>
+#ifndef LILA_REPL_H
+#define LILA_REPL_H
 
-#include "repl.hpp"
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
-int main(int argc, char** argv) {
+#include "codegen.hpp"
+#include "jit.hpp"
+#include "parser.hpp"
 
-  llvm::InitializeNativeTarget();
-  llvm::InitializeNativeTargetAsmPrinter();
-  llvm::InitializeNativeTargetAsmParser();
+#include <llvm/Support/TargetSelect.h>
 
-  lila::repl(cin, cout, cerr);
+using namespace lila::codegen;
+using namespace lila::parser;
 
-  return 0;
+namespace lila {
+
+  void repl(istream &replin, ostream &replout, ostream &replerr);
+
 }
+
+#endif

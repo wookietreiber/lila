@@ -2,7 +2,13 @@ AM_CXXFLAGS = -Wall -pedantic -std=c++14 -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT
 
 bin_PROGRAMS = lila lilac
 
-lila_SOURCES = lila.cpp
+lila_SOURCES = \
+	lila.cpp \
+	jit.hpp \
+	jit.cpp \
+	repl.hpp \
+	repl.cpp
+
 lila_LDADD = liblilac.a -lLLVM
 
 lilac_SOURCES = lilac.cpp
