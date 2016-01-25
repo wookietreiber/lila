@@ -1,6 +1,6 @@
 #!/bin/bash
 
-LILAC=../lilac/lilac
+LILAC=../src/compiler/lilac
 
 OBJECT=$(mktemp)
 LINKED=$(mktemp)

@@ -3,7 +3,7 @@
 
 AC_PREREQ([2.69])
 AC_INIT([lila], [0.1.0], [https://github.com/wookietreiber/lila/issues])
-AC_CONFIG_SRCDIR([lilac/lilac.cpp])
+AC_CONFIG_SRCDIR([src/compiler/lilac.cpp])
 AC_CONFIG_HEADERS([config.h])
 
 # Automake invocation.
@@ -24,6 +24,7 @@ AC_CHECK_HEADER_STDBOOL
 AC_FUNC_STRTOD
 
 AC_CONFIG_FILES([Makefile
-                 lilac/Makefile
+                 src/Makefile
+                 src/compiler/Makefile
                  test/Makefile])
 AC_OUTPUT
