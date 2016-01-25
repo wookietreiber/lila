@@ -45,19 +45,28 @@ namespace lila {
       return nullptr;
     }
 
-    void CodeGen::wrapInMain(llvm::Value *code) {
+    llvm::Function * CodeGen::wrapInFunc(llvm::Value *code, string name) {
       // Make the function type:  double(void)
       vector<llvm::Type *> args;
       llvm::FunctionType *FT = llvm::FunctionType::get(llvm::Type::getDoubleTy(context), args, false);
 
       llvm::Function *TheFunction =
-        llvm::Function::Create(FT, llvm::Function::ExternalLinkage, "anonymous", module.get());
+        llvm::Function::Create(FT, llvm::Function::ExternalLinkage, name, module.get());
 
       // Create a new basic block to start insertion into.
       llvm::BasicBlock *BB = llvm::BasicBlock::Create(context, "entry", TheFunction);
       Builder.SetInsertPoint(BB);
 
       Builder.CreateRet(code);
+
+      verifyFunction(*TheFunction);
+
+      return TheFunction;
+    }
+
+    void CodeGen::wrapInMain(llvm::Value *code) {
+      // generate a function
+      llvm::Function * TheFunction = wrapInFunc(code, "anonymous");
 
       // generate void main()
       llvm::FunctionType *voidType = llvm::FunctionType::get(Builder.getVoidTy(), false);
@@ -90,15 +99,16 @@ namespace lila {
       Builder.CreateRetVoid();
 
       // Validate the generated code, checking for consistency.
-      verifyFunction(*TheFunction);
       verifyFunction(*mainFunc);
     }
 
-    void CodeGen::generateCode(unique_ptr<ASTNode> ast) {
+    void CodeGen::generateCode(unique_ptr<ASTNode> ast, bool wrap) {
       if (auto x = dynamic_cast<NumberExprAST*>(ast.get())) {
-        wrapInMain(generateCodeNumber(x));
+        auto code = generateCodeNumber(x);
+        if (wrap) wrapInMain(code); else wrapInFunc(code, "anonymous");
       } else if (auto x = dynamic_cast<BinaryExprAST*>(ast.get())) {
-        wrapInMain(generateCodeBinOp(x));
+        auto code = generateCodeBinOp(x);
+        if (wrap) wrapInMain(code); else wrapInFunc(code, "anonymous");
       } else
         throw "can't handle ast";
     }

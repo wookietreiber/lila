@@ -129,7 +129,7 @@ int main(int argc, char** argv) {
 
   CodeGen codegen("lilamodule", llvm::getGlobalContext());
 
-  codegen.generateCode(move(ast));
+  codegen.generateCode(move(ast), true);
 
   // ---------------------------------------------------------------------------
   // write object file

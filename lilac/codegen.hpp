@@ -38,9 +38,10 @@ namespace lila {
       llvm::Value * generateCodeNumber(NumberExprAST *ast);
       llvm::Value * generateCodeBinOp(BinaryExprAST *ast);
 
+      llvm::Function * wrapInFunc(llvm::Value *code, string name);
       void wrapInMain(llvm::Value *code);
 
-      void generateCode(unique_ptr<ASTNode> ast);
+      void generateCode(unique_ptr<ASTNode> ast, bool wrap);
     };
 
   }

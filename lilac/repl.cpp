@@ -82,7 +82,7 @@ void lila::repl(istream &replin, ostream &replout, ostream &replerr) {
     // TODO pattern match on ast (may not always be top level expression)
 
     CodeGen codegen("lilamodule", llvm::getGlobalContext());
-    codegen.generateCode(move(ast));
+    codegen.generateCode(move(ast), false);
 
     if (verbose) {
       llvm::raw_os_ostream llvmreplerr(replerr);
