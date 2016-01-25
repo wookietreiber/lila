@@ -10,14 +10,12 @@
 namespace lila {
   namespace lexer {
 
-    int tokenize(basic_istream<char>* is, vector<unique_ptr<Token>>* tokens) {
+    void tokenize(basic_istream<char>* is, vector<unique_ptr<Token>>* tokens) {
       char c;
+      is->get(c);
 
-      while (is && is->get(c)) {
-        if (isspace(c))
-          continue;
-
-        if (isdigit(c)) { // Number: [0-9]+
+      while (is && !is->eof()) {
+        if (isdigit(c)) { // number: [0-9]+
           string number;
           number += c;
 
@@ -28,19 +26,30 @@ namespace lila {
           auto numberToken = llvm::make_unique<NumberToken>(value);
           tokens->push_back(move(numberToken));
 
-        } else { // other token
+        } else if (isalpha(c)) { // [a-zA-Z][a-zA-Z0-9]* token
           string str;
           str += c;
 
-          while (is && is->get(c) && !isspace(c))
+          while (is && is->get(c) && isalnum(c))
             str += c;
 
           auto otherToken = llvm::make_unique<OtherToken>(str);
           tokens->push_back(move(otherToken));
+
+        } else if (ispunct(c)) { // punctuation token
+          string str;
+          str += c;
+
+          while (is && is->get(c) && ispunct(c))
+            str += c;
+
+          auto otherToken = llvm::make_unique<OtherToken>(str);
+          tokens->push_back(move(otherToken));
+
+        } else { // ignore
+          is->get(c);
         }
       }
-
-      return 0;
     }
 
   }

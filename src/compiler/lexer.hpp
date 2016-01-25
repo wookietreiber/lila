@@ -17,7 +17,7 @@ using namespace lila::token;
 namespace lila {
   namespace lexer {
 
-    int tokenize(basic_istream<char>* is, vector<unique_ptr<Token>>* tokens);
+    void tokenize(basic_istream<char>* is, vector<unique_ptr<Token>>* tokens);
 
   }
 }
