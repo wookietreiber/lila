@@ -23,7 +23,7 @@ namespace lila {
     private:
       vector<unique_ptr<Token>>* tokens;
       map<string, int> operatorPrecendences;
-      unique_ptr<Token> curtok;
+      Token * curtok;
       vector<unique_ptr<Token>>::size_type pos = 0;
 
       int getPrecedence(string op) {
@@ -39,11 +39,11 @@ namespace lila {
         auto size = tokens->size();
 
         if (pos >= size) {
-          curtok = nullptr;
+          curtok = NULL;
           return 0;
         }
 
-        curtok = move(tokens->at(pos++));
+        curtok = tokens->at(pos++).get();
 
         return 1;
       }

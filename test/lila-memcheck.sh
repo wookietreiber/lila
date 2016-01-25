@@ -12,7 +12,7 @@ MEMCHECK_OUT=$(mktemp)
 trap "rm -f $MEMCHECK_OUT" EXIT
 
 valgrind --tool=memcheck --leak-check=full --track-origins=yes --error-exitcode=1 \
-  $LILA < /dev/null \
+  $LILA <<< '20 + 22' \
     2> $MEMCHECK_OUT
 
 VALGRIND_EXIT_STATUS=$?

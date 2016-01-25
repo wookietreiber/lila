@@ -50,7 +50,7 @@ namespace lila {
         return *targetMachine;
       }
 
-      llvm::orc::JITSymbol findSymbol(const string name) {
+      llvm::orc::JITSymbol findSymbol(const string &name) {
         return findMangledSymbol(mangle(name));
       }
     };
