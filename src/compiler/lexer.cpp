@@ -11,6 +11,7 @@ namespace lila {
   namespace lexer {
 
     void tokenize(basic_istream<char>* is, vector<unique_ptr<Token>>* tokens) {
+      unsigned int parens = 0;
       char c;
       is->get(c);
 
@@ -55,6 +56,22 @@ namespace lila {
 
           auto otherToken = llvm::make_unique<OtherToken>(str);
           tokens->push_back(move(otherToken));
+
+        } else if (c == '(') {
+          parens++;
+          auto parenopen = llvm::make_unique<ParenOpen>();
+          tokens->push_back(move(parenopen));
+          is->get(c);
+
+        } else if (c == ')') {
+          if (parens == 0) {
+            throw "closing parens when none is open";
+          } else {
+            parens--;
+            auto parenclose = llvm::make_unique<ParenClose>();
+            tokens->push_back(move(parenclose));
+            is->get(c);
+          }
 
         } else if (ispunct(c)) { // punctuation token
           string str;

@@ -36,6 +36,22 @@ namespace lila {
       }
     };
 
+    class ParenClose : public Token {
+    public:
+      explicit ParenClose() {}
+      string toString() {
+        return "CLOSE)";
+      }
+    };
+
+    class ParenOpen : public Token {
+    public:
+      explicit ParenOpen() {}
+      string toString() {
+        return "OPEN(";
+      }
+    };
+
   }
 }
 

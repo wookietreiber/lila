@@ -50,6 +50,7 @@ namespace lila {
 
       unique_ptr<ExprAST> parseExpression();
       unique_ptr<ExprAST> parseNumberExpr(NumberToken* tok);
+      unique_ptr<ExprAST> parseParenExpr();
       unique_ptr<ExprAST> parsePrimary();
       unique_ptr<ExprAST> parseBinOpRHS(unique_ptr<ExprAST> lhs, int prec);
 

@@ -53,8 +53,12 @@ namespace lila {
 
             // Merge lhs/rhs.
             lhs = llvm::make_unique<BinaryExprAST>(op->value, move(lhs), move(rhs));
+          } else if (dynamic_cast<ParenClose*>(curtok)) {
+            return llvm::make_unique<BinaryExprAST>(op->value, move(lhs), move(rhs));
           }
 
+        } else if (dynamic_cast<ParenClose*>(curtok)) {
+          return lhs;
         } else {
           throw "unknown token when expecting an operation";
         }
@@ -63,9 +67,22 @@ namespace lila {
       return lhs;
     }
 
+    unique_ptr<ExprAST> Parser::parseParenExpr() {
+      nextToken();
+      auto expr = parseExpression();
+
+      if (dynamic_cast<ParenClose*>(curtok)) {
+        return expr;
+      } else {
+        throw "expected ')'";
+      }
+    }
+
     unique_ptr<ExprAST> Parser::parsePrimary() {
       if (auto t = dynamic_cast<NumberToken*>(curtok)) {
         return parseNumberExpr(t);
+      } else if (dynamic_cast<ParenOpen*>(curtok)) {
+        return parseParenExpr();
       } else {
         throw "unknown token when expecting an expression";
       }
