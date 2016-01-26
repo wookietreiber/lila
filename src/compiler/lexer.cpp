@@ -19,12 +19,32 @@ namespace lila {
           string number;
           number += c;
 
-          while (is && is->get(c) && isdigit(c))
-            number += c;
+          bool hasdot = false;
+
+          while (is && is->get(c)) {
+            if (isdigit(c))
+              number += c;
+            else if (c == '.' && !hasdot) {
+              number += c;
+              hasdot = true;
+            } else
+              break;
+          }
 
           double value = strtod(number.c_str(), nullptr);
           auto numberToken = llvm::make_unique<NumberToken>(value);
           tokens->push_back(move(numberToken));
+
+          // check if last char of number is a dot ...
+          if (number.back() == '.') {
+            // ... to add final dot to tokens to allow for:
+            //   number.method, e.g.:
+            //     5.abs
+            //   number.method(args), e.g.:
+            //     5.max(6)
+            auto dotToken = llvm::make_unique<OtherToken>(".");
+            tokens->push_back(move(dotToken));
+          }
 
         } else if (isalpha(c)) { // [a-zA-Z][a-zA-Z0-9]* token
           string str;
