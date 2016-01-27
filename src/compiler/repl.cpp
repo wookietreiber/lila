@@ -55,17 +55,25 @@ void lila::repl(istream &replin, ostream &replout, ostream &replerr) {
 
     // tokenize the line
     istringstream streamed(line);
-    vector<unique_ptr<Token>> tokens;
-    tokenize(&streamed, &tokens);
+
+    unique_ptr<LexerResult> lexerResult = tokenize(&streamed);
+
+    if (auto failure = dynamic_cast<LexerFailure*>(lexerResult.get())) {
+      replerr << "[lexer] [error] " << failure->msg << endl;
+      continue;
+    }
+
+    LexerSuccess * lexsuccess = dynamic_cast<LexerSuccess*>(lexerResult.get());
+    vector<unique_ptr<Token>> * tokens = lexsuccess->tokens.get();
 
     if (verbose)
-      for (auto it = tokens.begin() ; it != tokens.end(); ++it) {
+      for (auto it = tokens->begin() ; it != tokens->end(); ++it) {
         Token * token = it->get();
         replerr << "[token] \"" << token->toString() << "\"" << endl;
       }
 
     // try parse tokens to ast
-    Parser parser(&tokens);
+    Parser parser(tokens);
     unique_ptr<ASTNode> ast;
     try {
       ast = parser.parse();

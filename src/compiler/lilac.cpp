@@ -83,15 +83,15 @@ int main(int argc, char** argv) {
   // read code and tokenize it
   // ---------------------------------------------------------------------------
 
-  vector<unique_ptr<Token>> tokens;
+  unique_ptr<LexerResult> lexerResult;
 
   if (strcmp(input, "-") == 0) {
-    tokenize(&cin, &tokens);
+    lexerResult = tokenize(&cin);
   } else {
     ifstream is(input);
 
     if (is) {
-      tokenize(&is, &tokens);
+      lexerResult = tokenize(&is);
       is.close();
     } else {
       cerr << "error opening file: " << input << endl;
@@ -99,8 +99,16 @@ int main(int argc, char** argv) {
     }
   }
 
+  if (auto failure = dynamic_cast<LexerFailure*>(lexerResult.get())) {
+    cerr << "[lexer] [error] " << failure->msg << endl;
+    return 1;
+  }
+
+  LexerSuccess * lexsuccess = dynamic_cast<LexerSuccess*>(lexerResult.get());
+  vector<unique_ptr<Token>> * tokens = lexsuccess->tokens.get();
+
   if (verbose)
-    for (auto it = tokens.begin() ; it != tokens.end(); ++it) {
+    for (auto it = tokens->begin() ; it != tokens->end(); ++it) {
       Token * token = it->get();
       cerr << "[debug] [token] \"" << token->toString() << "\"" << endl;
     }
@@ -109,7 +117,7 @@ int main(int argc, char** argv) {
   // parse the tokens to AST
   // ---------------------------------------------------------------------------
 
-  Parser parser(&tokens);
+  Parser parser(tokens);
 
   unique_ptr<ASTNode> ast;
 

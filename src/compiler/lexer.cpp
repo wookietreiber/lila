@@ -10,7 +10,9 @@
 namespace lila {
   namespace lexer {
 
-    void tokenize(basic_istream<char>* is, vector<unique_ptr<Token>>* tokens) {
+    unique_ptr<LexerResult> tokenize(basic_istream<char>* is) {
+      auto tokens = llvm::make_unique<vector<unique_ptr<Token>>>();
+
       unsigned int parens = 0;
       char c;
       is->get(c);
@@ -65,7 +67,8 @@ namespace lila {
 
         } else if (c == ')') {
           if (parens == 0) {
-            throw "closing parens when none is open";
+            auto failure = llvm::make_unique<LexerFailure>("closing parens when none is open");
+            return move(failure);
           } else {
             parens--;
             auto parenclose = llvm::make_unique<ParenClose>();
@@ -87,6 +90,9 @@ namespace lila {
           is->get(c);
         }
       }
+
+      auto success = llvm::make_unique<LexerSuccess>(move(tokens));
+      return move(success);
     }
 
   }

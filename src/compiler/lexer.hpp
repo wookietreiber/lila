@@ -17,7 +17,24 @@ using namespace lila::token;
 namespace lila {
   namespace lexer {
 
-    void tokenize(basic_istream<char>* is, vector<unique_ptr<Token>>* tokens);
+    class LexerResult {
+    public:
+      virtual ~LexerResult() {}
+    };
+
+    class LexerSuccess : public LexerResult {
+    public:
+      unique_ptr<vector<unique_ptr<Token>>> tokens;
+      explicit LexerSuccess(unique_ptr<vector<unique_ptr<Token>>> tokens) : tokens(move(tokens)) {}
+    };
+
+    class LexerFailure : public LexerResult {
+    public:
+      string msg;
+      explicit LexerFailure(string msg) : msg(msg) {}
+    };
+
+    unique_ptr<LexerResult> tokenize(basic_istream<char>* is);
 
   }
 }
