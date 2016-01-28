@@ -40,7 +40,7 @@ namespace lila {
     public:
       explicit ParenClose() {}
       string toString() {
-        return "CLOSE)";
+        return ")";
       }
     };
 
@@ -48,7 +48,7 @@ namespace lila {
     public:
       explicit ParenOpen() {}
       string toString() {
-        return "OPEN(";
+        return "(";
       }
     };
 

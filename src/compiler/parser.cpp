@@ -26,7 +26,8 @@ namespace lila {
             return lhs;
 
           if (!nextToken()) {
-            throw "expected token after operation";
+            error = "expected token after operation";
+            return nullptr;
           }
 
           // parse primary expression after the operator
@@ -60,7 +61,8 @@ namespace lila {
         } else if (dynamic_cast<ParenClose*>(curtok)) {
           return lhs;
         } else {
-          throw "unknown token when expecting an operation";
+          error = "unknown token when expecting an operation";
+          return nullptr;
         }
       }
 
@@ -74,7 +76,8 @@ namespace lila {
       if (dynamic_cast<ParenClose*>(curtok)) {
         return expr;
       } else {
-        throw "expected ')'";
+        error = "expected ')'";
+        return nullptr;
       }
     }
 
@@ -84,7 +87,8 @@ namespace lila {
       } else if (dynamic_cast<ParenOpen*>(curtok)) {
         return parseParenExpr();
       } else {
-        throw "unknown token when expecting an expression";
+        error = "unknown token when expecting an expression";
+        return nullptr;
       }
     }
 
@@ -98,15 +102,21 @@ namespace lila {
       return parseBinOpRHS(move(lhs), 0);
     }
 
-    unique_ptr<ASTNode> Parser::parse() {
+    unique_ptr<ParserResult> Parser::parse() {
       unique_ptr<ASTNode> curast;
       pos = 0;
 
       while (nextToken()) {
         curast = parseExpression();
+
+        if (!curast) {
+          auto failure = llvm::make_unique<ParserFailure>(error);
+          return move(failure);
+        }
       }
 
-      return curast;
+      auto success = llvm::make_unique<ParserSuccess>(move(curast));
+      return move(success);
     }
   }
 }

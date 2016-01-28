@@ -19,12 +19,30 @@ using namespace lila::lexer;
 namespace lila {
   namespace parser {
 
+    class ParserResult {
+    public:
+      virtual ~ParserResult() {}
+    };
+
+    class ParserSuccess : public ParserResult {
+    public:
+      unique_ptr<ASTNode> ast;
+      explicit ParserSuccess(unique_ptr<ASTNode> ast) : ast(move(ast)) {}
+    };
+
+    class ParserFailure : public ParserResult {
+    public:
+      string msg;
+      explicit ParserFailure(string msg) : msg(msg) {}
+    };
+
     class Parser {
     private:
       vector<unique_ptr<Token>>* tokens;
       map<string, int> operatorPrecendences;
       Token * curtok;
       vector<unique_ptr<Token>>::size_type pos = 0;
+      string error;
 
       int getPrecedence(string op) {
         int precedence = operatorPrecendences[op];
@@ -61,7 +79,7 @@ namespace lila {
         operatorPrecendences["*"] = 40;
       }
 
-      unique_ptr<ASTNode> parse();
+      unique_ptr<ParserResult> parse();
     };
 
   }

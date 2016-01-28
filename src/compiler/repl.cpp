@@ -56,7 +56,7 @@ void lila::repl(istream &replin, ostream &replout, ostream &replerr) {
     // tokenize the line
     istringstream streamed(line);
 
-    unique_ptr<LexerResult> lexerResult = tokenize(&streamed);
+    auto lexerResult = tokenize(&streamed);
 
     if (auto failure = dynamic_cast<LexerFailure*>(lexerResult.get())) {
       replerr << "[lexer] [error] " << failure->msg << endl;
@@ -74,18 +74,21 @@ void lila::repl(istream &replin, ostream &replout, ostream &replerr) {
 
     // try parse tokens to ast
     Parser parser(tokens);
-    unique_ptr<ASTNode> ast;
-    try {
-      ast = parser.parse();
 
-      if (verbose)
-        replerr << "[ast] " << ast->toString() << endl;
-    } catch (const char * msg) {
-      replerr << msg << endl;
+    auto parserResult = parser.parse();
+
+    if (auto failure = dynamic_cast<ParserFailure*>(parserResult.get())) {
       // TODO if expression incomplete, i.e. could continue,
       // TODO do NOT clear line/tokens, read next line and try again
+      replerr << "[parser] [error] " << failure->msg << endl;
       continue;
     }
+
+    auto parsesuccess = dynamic_cast<ParserSuccess*>(parserResult.get());
+    auto ast = move(parsesuccess->ast);
+
+    if (verbose)
+      replerr << "[ast] " << ast->toString() << endl;
 
     // TODO pattern match on ast (may not always be top level expression)
 

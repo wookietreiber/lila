@@ -110,7 +110,7 @@ int main(int argc, char** argv) {
   if (verbose)
     for (auto it = tokens->begin() ; it != tokens->end(); ++it) {
       Token * token = it->get();
-      cerr << "[debug] [token] \"" << token->toString() << "\"" << endl;
+      cerr << "[token] \"" << token->toString() << "\"" << endl;
     }
 
   // ---------------------------------------------------------------------------
@@ -119,17 +119,18 @@ int main(int argc, char** argv) {
 
   Parser parser(tokens);
 
-  unique_ptr<ASTNode> ast;
+  auto parserResult = parser.parse();
 
-  try {
-    ast = parser.parse();
-  } catch (const char * msg) {
-    cerr << msg << endl;
+  if (auto failure = dynamic_cast<ParserFailure*>(parserResult.get())) {
+    cerr << "[parser] [error] " << failure->msg << endl;
     return 1;
   }
 
+  auto parsesuccess = dynamic_cast<ParserSuccess*>(parserResult.get());
+  auto ast = move(parsesuccess->ast);
+
   if (verbose)
-    cerr << "[debug] [ast] " << ast->toString() << endl;
+    cerr << "[ast] " << ast->toString() << endl;
 
   // ---------------------------------------------------------------------------
   // generate LLVM IR code
