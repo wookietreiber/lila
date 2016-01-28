@@ -22,13 +22,30 @@ using namespace lila::ast;
 namespace lila {
   namespace codegen {
 
+    class CodegenResult {
+    public:
+      virtual ~CodegenResult() {}
+    };
+
+    class CodegenSuccess : public CodegenResult {
+    public:
+      unique_ptr<llvm::Module> module;
+      explicit CodegenSuccess(unique_ptr<llvm::Module> module) : module(move(module)) {}
+    };
+
+    class CodegenFailure : public CodegenResult {
+    public:
+      string msg;
+      explicit CodegenFailure(string msg) : msg(msg) {}
+    };
+
     class CodeGen {
       llvm::LLVMContext& context;
       llvm::IRBuilder<> Builder;
+      unique_ptr<llvm::Module> module;
+      string error;
 
     public:
-      unique_ptr<llvm::Module> module;
-
       CodeGen(string modulename, llvm::LLVMContext& ctx)
         : context(ctx), Builder(llvm::IRBuilder<>(ctx)) {
         module = llvm::make_unique<llvm::Module>(modulename, context);
@@ -41,7 +58,7 @@ namespace lila {
       llvm::Function * wrapInFunc(llvm::Value *code, string name);
       void wrapInMain(llvm::Value *code);
 
-      void generateCode(unique_ptr<ASTNode> ast, bool wrap);
+      unique_ptr<CodegenResult> generateCode(unique_ptr<ASTNode> ast, bool wrap);
     };
 
   }

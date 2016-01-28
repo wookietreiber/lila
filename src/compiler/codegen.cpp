@@ -19,8 +19,10 @@ namespace lila {
         return generateCodeNumber(x);
       } else if (auto x = dynamic_cast<BinaryExprAST*>(ast)) {
         return generateCodeBinOp(x);
-      } else
-        throw "oops";
+      } else {
+        error = "can't handle expression ast";
+        return nullptr;
+      }
     }
 
     llvm::Value* CodeGen::generateCodeBinOp(BinaryExprAST *ast) {
@@ -39,7 +41,7 @@ namespace lila {
       } else if (op == "*") {
         return Builder.CreateFMul(L, R, "multmp");
       } else {
-        throw "unknown operator";
+        error = "unknown operator, don't know what to do with it";
       }
 
       return nullptr;
@@ -102,15 +104,28 @@ namespace lila {
       verifyFunction(*mainFunc);
     }
 
-    void CodeGen::generateCode(unique_ptr<ASTNode> ast, bool wrap) {
+    unique_ptr<CodegenResult> CodeGen::generateCode(unique_ptr<ASTNode> ast, bool wrap) {
       if (auto x = dynamic_cast<NumberExprAST*>(ast.get())) {
         auto code = generateCodeNumber(x);
+        if (!code) {
+          auto failure = llvm::make_unique<CodegenFailure>(error);
+          return move(failure);
+        }
         if (wrap) wrapInMain(code); else wrapInFunc(code, "anonymous");
       } else if (auto x = dynamic_cast<BinaryExprAST*>(ast.get())) {
         auto code = generateCodeBinOp(x);
+        if (!code) {
+          auto failure = llvm::make_unique<CodegenFailure>(error);
+          return move(failure);
+        }
         if (wrap) wrapInMain(code); else wrapInFunc(code, "anonymous");
-      } else
-        throw "can't handle ast";
+      } else {
+        auto failure = llvm::make_unique<CodegenFailure>("can't handle ast");
+        return move(failure);
+      }
+
+      auto success = llvm::make_unique<CodegenSuccess>(move(module));
+      return move(success);
     }
 
   }

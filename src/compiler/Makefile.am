@@ -1,4 +1,4 @@
-AM_CXXFLAGS = -Wall -pedantic -std=c++14 -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS
+AM_CXXFLAGS = -Wall -pedantic -std=c++14 -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -fno-exceptions
 
 bin_PROGRAMS = lila lilac
 

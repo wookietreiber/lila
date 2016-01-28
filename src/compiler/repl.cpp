@@ -93,15 +93,24 @@ void lila::repl(istream &replin, ostream &replout, ostream &replerr) {
     // TODO pattern match on ast (may not always be top level expression)
 
     CodeGen codegen("lilamodule", llvm::getGlobalContext());
-    codegen.generateCode(move(ast), false);
+
+    auto cgresult = codegen.generateCode(move(ast), true);
+
+    if (auto failure = dynamic_cast<CodegenFailure*>(cgresult.get())) {
+      replerr << "[codegen] [error] " << failure->msg << endl;
+      continue;
+    }
+
+    auto cgsuccess = dynamic_cast<CodegenSuccess*>(cgresult.get());
+    auto module = move(cgsuccess->module);
 
     if (verbose) {
       llvm::raw_os_ostream llvmreplerr(replerr);
-      codegen.module->print(llvmreplerr, nullptr);
+      module->print(llvmreplerr, nullptr);
     }
 
-    codegen.module->setDataLayout(jit->getTargetMachine().createDataLayout());
-    auto moduleHandle = jit->addModule(move(codegen.module));
+    module->setDataLayout(jit->getTargetMachine().createDataLayout());
+    auto moduleHandle = jit->addModule(move(module));
 
     auto symbol = jit->findSymbol("anonymous");
     assert(symbol && "function not found");

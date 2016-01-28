@@ -138,7 +138,15 @@ int main(int argc, char** argv) {
 
   CodeGen codegen("lilamodule", llvm::getGlobalContext());
 
-  codegen.generateCode(move(ast), true);
+  auto cgresult = codegen.generateCode(move(ast), true);
+
+  if (auto failure = dynamic_cast<CodegenFailure*>(cgresult.get())) {
+    cerr << "[codegen] [error] " << failure->msg << endl;
+    return 1;
+  }
+
+  auto cgsuccess = dynamic_cast<CodegenSuccess*>(cgresult.get());
+  auto module = move(cgsuccess->module);
 
   // ---------------------------------------------------------------------------
   // write object file
@@ -199,10 +207,10 @@ int main(int argc, char** argv) {
   PM.add(new llvm::TargetLibraryInfoWrapperPass(TLII));
 
   if (const llvm::DataLayout *DL = Target->getDataLayout())
-    codegen.module->setDataLayout(*DL);
+    module->setDataLayout(*DL);
 
   // add features to functions of module
-  for (auto &F : *codegen.module) {
+  for (auto &F : *module) {
     auto &Ctx = F.getContext();
     llvm::AttributeSet Attrs = F.getAttributes(), NewAttrs;
 
@@ -225,7 +233,7 @@ int main(int argc, char** argv) {
     return 1;
   }
 
-  PM.run(*codegen.module);
+  PM.run(*module);
 
   Out->keep();
 
