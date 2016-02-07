@@ -102,12 +102,49 @@ namespace lila {
       return parseBinOpRHS(move(lhs), 0);
     }
 
+    // val name = expr
+    unique_ptr<ValueAST> Parser::parseValue() {
+      string name;
+
+      nextToken(); // eat "val" token
+
+      if (auto t = dynamic_cast<OtherToken*>(curtok)) {
+        name = t->value;
+      } else {
+        error = "expected value name";
+        return nullptr;
+      }
+
+      nextToken(); // eat name of value token
+
+      if (!dynamic_cast<AssignmentToken*>(curtok)) {
+        error = "expected \"=\"";
+        return nullptr;
+      }
+
+      nextToken(); // eat "=" token
+
+      auto expr = parseExpression();
+
+      if (!expr) {
+        error = "expected expression";
+        return nullptr;
+      }
+
+      auto ast = llvm::make_unique<ValueAST>(name, move(expr));
+      return ast;
+    }
+
     unique_ptr<ParserResult> Parser::parse() {
       unique_ptr<ASTNode> curast;
       pos = 0;
 
       while (nextToken()) {
-        curast = parseExpression();
+        if (dynamic_cast<ValueToken*>(curtok)) {
+          curast = parseValue();
+        } else {
+          curast = parseExpression();
+        }
 
         if (!curast) {
           auto failure = llvm::make_unique<ParserFailure>(error);

@@ -46,6 +46,16 @@ namespace lila {
       }
     };
 
+    class ValueAST : public ASTNode {
+    public:
+      string name;
+      unique_ptr<ExprAST> expr;
+      ValueAST(string name, unique_ptr<ExprAST> expr) : name(name), expr(move(expr)) {}
+      string toString() {
+        return "val " + name + " = " + expr->toString();
+      }
+    };
+
   }
 }
 
