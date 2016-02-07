@@ -72,6 +72,7 @@ namespace lila {
       unique_ptr<ExprAST> parseParenExpr();
       unique_ptr<ExprAST> parsePrimary();
       unique_ptr<ExprAST> parseBinOpRHS(unique_ptr<ExprAST> lhs, int prec);
+      unique_ptr<ExprAST> parseIdentifier(string name);
       unique_ptr<ValueAST> parseValue();
 
     public:

@@ -90,10 +90,22 @@ namespace lila {
         return parseNumberExpr(t);
       } else if (dynamic_cast<ParenOpen*>(curtok)) {
         return parseParenExpr();
+      } else if (auto t = dynamic_cast<OtherToken*>(curtok)) {
+        if (names.find(t->value) != names.end()) {
+          return parseIdentifier(t->value);
+        } else {
+          error = "unknown token when expecting an expression";
+          return nullptr;
+        }
       } else {
         error = "unknown token when expecting an expression";
         return nullptr;
       }
+    }
+
+    unique_ptr<ExprAST> Parser::parseIdentifier(string name) {
+      auto ast = llvm::make_unique<CallValueAST>(name);
+      return move(ast);
     }
 
     unique_ptr<ExprAST> Parser::parseExpression() {

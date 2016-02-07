@@ -56,6 +56,15 @@ namespace lila {
       }
     };
 
+    class CallValueAST : public ExprAST {
+    public:
+      string name;
+      CallValueAST(string name) : name(name) {}
+      string toString() {
+        return name;
+      }
+    };
+
   }
 }
 
