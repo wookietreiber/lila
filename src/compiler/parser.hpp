@@ -40,6 +40,7 @@ namespace lila {
     private:
       vector<unique_ptr<Token>>* tokens;
       map<string, int> operatorPrecendences;
+      map<string, string> names;
       Token * curtok;
       vector<unique_ptr<Token>>::size_type pos = 0;
       string error;

@@ -135,6 +135,12 @@ namespace lila {
         return nullptr;
       }
 
+      if (names.find(name) != names.end()) {
+        error = name + " is already defined";
+        return nullptr;
+      }
+
+      names[name] = name;
       auto ast = llvm::make_unique<ValueAST>(name, move(expr));
       return ast;
     }
