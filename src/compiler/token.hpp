@@ -52,6 +52,22 @@ namespace lila {
       }
     };
 
+    class ValueToken : public Token {
+    public:
+      explicit ValueToken() {}
+      string toString() {
+        return "val";
+      }
+    };
+
+    class AssignmentToken : public Token {
+    public:
+      explicit AssignmentToken() {}
+      string toString() {
+        return "=";
+      }
+    };
+
   }
 }
 

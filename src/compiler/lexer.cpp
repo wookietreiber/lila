@@ -56,8 +56,13 @@ namespace lila {
           while (is && is->get(c) && isalnum(c))
             str += c;
 
-          auto otherToken = llvm::make_unique<OtherToken>(str);
-          tokens->push_back(move(otherToken));
+          if (str.compare("val") == 0) {
+            auto valueToken = llvm::make_unique<ValueToken>();
+            tokens->push_back(move(valueToken));
+          } else {
+            auto otherToken = llvm::make_unique<OtherToken>(str);
+            tokens->push_back(move(otherToken));
+          }
 
         } else if (c == '(') {
           parens++;
@@ -83,8 +88,13 @@ namespace lila {
           while (is && is->get(c) && ispunct(c))
             str += c;
 
-          auto otherToken = llvm::make_unique<OtherToken>(str);
-          tokens->push_back(move(otherToken));
+          if (str.compare("=") == 0) {
+            auto assignmentToken = llvm::make_unique<AssignmentToken>();
+            tokens->push_back(move(assignmentToken));
+          } else {
+            auto otherToken = llvm::make_unique<OtherToken>(str);
+            tokens->push_back(move(otherToken));
+          }
 
         } else { // ignore
           is->get(c);
