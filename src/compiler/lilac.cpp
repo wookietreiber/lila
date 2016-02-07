@@ -148,6 +148,10 @@ int main(int argc, char** argv) {
   auto cgsuccess = dynamic_cast<CodegenSuccess*>(cgresult.get());
   auto module = move(cgsuccess->module);
 
+  if (verbose) {
+    module->dump();
+  }
+
   // ---------------------------------------------------------------------------
   // write object file
   // ---------------------------------------------------------------------------
