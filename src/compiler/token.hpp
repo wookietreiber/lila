@@ -68,6 +68,14 @@ namespace lila {
       }
     };
 
+    class NewlineToken : public Token {
+    public:
+      explicit NewlineToken() {}
+      string toString() {
+        return "\\n";
+      }
+    };
+
   }
 }
 

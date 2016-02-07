@@ -54,11 +54,15 @@ namespace lila {
 
             // Merge lhs/rhs.
             lhs = llvm::make_unique<BinaryExprAST>(op->value, move(lhs), move(rhs));
+          } else if (dynamic_cast<NewlineToken*>(curtok)) {
+            return llvm::make_unique<BinaryExprAST>(op->value, move(lhs), move(rhs));
           } else if (dynamic_cast<ParenClose*>(curtok)) {
             return llvm::make_unique<BinaryExprAST>(op->value, move(lhs), move(rhs));
           }
 
         } else if (dynamic_cast<ParenClose*>(curtok)) {
+          return lhs;
+        } else if (dynamic_cast<NewlineToken*>(curtok)) {
           return lhs;
         } else {
           error = "unknown token when expecting an operation";
@@ -127,7 +131,7 @@ namespace lila {
       auto expr = parseExpression();
 
       if (!expr) {
-        error = "expected expression";
+        error = "expected expression: " + error;
         return nullptr;
       }
 
@@ -140,7 +144,9 @@ namespace lila {
       pos = 0;
 
       while (nextToken()) {
-        if (dynamic_cast<ValueToken*>(curtok)) {
+        if (dynamic_cast<NewlineToken*>(curtok)) {
+          continue;
+        } else if (dynamic_cast<ValueToken*>(curtok)) {
           curast = parseValue();
         } else {
           curast = parseExpression();

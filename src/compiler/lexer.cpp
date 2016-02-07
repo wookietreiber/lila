@@ -96,6 +96,11 @@ namespace lila {
             tokens->push_back(move(otherToken));
           }
 
+        } else if (c == '\n') {
+          auto token = llvm::make_unique<NewlineToken>();
+          tokens->push_back(move(token));
+          is->get(c);
+
         } else { // ignore
           is->get(c);
         }
