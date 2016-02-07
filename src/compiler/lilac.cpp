@@ -130,7 +130,7 @@ int main(int argc, char** argv) {
   auto ast = move(parsesuccess->ast);
 
   if (verbose)
-    cerr << "[ast] " << ast->toString() << endl;
+    cerr << "[ast]" << endl << ast->toString() << "[/ast]" << endl;
 
   // ---------------------------------------------------------------------------
   // generate LLVM IR code

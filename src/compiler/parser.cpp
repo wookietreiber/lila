@@ -157,9 +157,11 @@ namespace lila {
       return ast;
     }
 
-    unique_ptr<ParserResult> Parser::parse() {
+    unique_ptr<ExprAST> Parser::parseTopLevelBlock(unique_ptr<ASTNode> first) {
+      auto body = llvm::make_unique<vector<unique_ptr<ASTNode>>>();
+      body->push_back(move(first));
+
       unique_ptr<ASTNode> curast;
-      pos = 0;
 
       while (nextToken()) {
         if (dynamic_cast<NewlineToken*>(curtok)) {
@@ -168,6 +170,32 @@ namespace lila {
           curast = parseValue();
         } else {
           curast = parseExpression();
+        }
+
+        if (curast) {
+          body->push_back(move(curast));
+        } else {
+          return nullptr;
+        }
+      }
+
+      auto block = llvm::make_unique<BlockAST>(move(body));
+      return move(block);
+    }
+
+    unique_ptr<ParserResult> Parser::parse() {
+      unique_ptr<ASTNode> curast;
+      pos = 0;
+
+      while (nextToken()) {
+        if (dynamic_cast<NewlineToken*>(curtok)) {
+          continue;
+        } else if (dynamic_cast<ValueToken*>(curtok)) {
+          auto ast = parseValue();
+          curast = parseTopLevelBlock(move(ast));
+        } else {
+          auto ast = parseExpression();
+          curast = parseTopLevelBlock(move(ast));
         }
 
         if (!curast) {

@@ -88,7 +88,7 @@ void lila::repl(istream &replin, ostream &replout, ostream &replerr) {
     auto ast = move(parsesuccess->ast);
 
     if (verbose)
-      replerr << "[ast] " << ast->toString() << endl;
+      replerr << "[ast]" << endl << ast->toString() << "[/ast]" << endl;
 
     // TODO pattern match on ast (may not always be top level expression)
 

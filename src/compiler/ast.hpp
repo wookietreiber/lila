@@ -10,6 +10,9 @@
 
 #include <memory>
 
+#include <sstream>
+#include <vector>
+
 using namespace std;
 
 namespace lila {
@@ -39,7 +42,7 @@ namespace lila {
     public:
       string Op;
       unique_ptr<ExprAST> LHS, RHS;
-      BinaryExprAST(string Op, unique_ptr<ExprAST> LHS, unique_ptr<ExprAST> RHS)
+      explicit BinaryExprAST(string Op, unique_ptr<ExprAST> LHS, unique_ptr<ExprAST> RHS)
         : Op(Op), LHS(move(LHS)), RHS(move(RHS)) {}
       string toString() {
         return '(' + LHS->toString() + ' ' + Op + ' ' + RHS->toString() + ')';
@@ -50,7 +53,7 @@ namespace lila {
     public:
       string name;
       unique_ptr<ExprAST> expr;
-      ValueAST(string name, unique_ptr<ExprAST> expr) : name(name), expr(move(expr)) {}
+      explicit ValueAST(string name, unique_ptr<ExprAST> expr) : name(name), expr(move(expr)) {}
       string toString() {
         return "val " + name + " = " + expr->toString();
       }
@@ -59,9 +62,25 @@ namespace lila {
     class CallValueAST : public ExprAST {
     public:
       string name;
-      CallValueAST(string name) : name(name) {}
+      explicit CallValueAST(string name) : name(name) {}
       string toString() {
         return name;
+      }
+    };
+
+    class BlockAST : public ExprAST {
+    public:
+      unique_ptr<vector<unique_ptr<ASTNode>>> body;
+      explicit BlockAST(unique_ptr<vector<unique_ptr<ASTNode>>> body) : body(move(body)) {}
+      string toString() {
+        ostringstream oss;
+        oss << "{" << endl;
+        for (auto it = body->begin() ; it != body->end(); ++it) {
+          ASTNode * ast = it->get();
+          oss << "  " << ast->toString() << endl;
+        }
+        oss << "}" << endl;
+        return oss.str();
       }
     };
 
