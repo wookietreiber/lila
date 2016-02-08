@@ -179,6 +179,11 @@ namespace lila {
         }
       }
 
+      if (!dynamic_cast<ExprAST*>(body->back().get())) {
+        error = "top level block does not end in expression";
+        return nullptr;
+      }
+
       auto block = llvm::make_unique<BlockAST>(move(body));
       return move(block);
     }

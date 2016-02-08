@@ -44,6 +44,7 @@ namespace lila {
       llvm::IRBuilder<> Builder;
       unique_ptr<llvm::Module> module;
       string error;
+      map<string, llvm::Value*> values;
 
     public:
       CodeGen(string modulename, llvm::LLVMContext& ctx)
@@ -54,11 +55,12 @@ namespace lila {
       llvm::Value * generateCodeExpr(ExprAST *ast);
       llvm::Value * generateCodeNumber(NumberExprAST *ast);
       llvm::Value * generateCodeBinOp(BinaryExprAST *ast);
+      llvm::Value * generateCodeCallValue(CallValueAST *ast);
+      llvm::Value * generateCodeValue(ValueAST *ast);
 
-      llvm::Function * wrapInFunc(llvm::Value *code, string name);
-      void wrapInMain(llvm::Value *code);
+      int wrapTopLevelBlockInMain(BlockAST *ast);
 
-      unique_ptr<CodegenResult> generateCode(unique_ptr<ASTNode> ast, bool wrap);
+      unique_ptr<CodegenResult> generateCode(unique_ptr<ASTNode> ast);
     };
 
   }

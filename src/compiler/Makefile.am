@@ -1,22 +1,10 @@
 AM_CXXFLAGS = -Wall -pedantic -std=c++14 -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -fno-exceptions
 
-bin_PROGRAMS = lila lilac
+bin_PROGRAMS = lilac
 
-lila_SOURCES = \
-	lila.cpp \
-	jit.hpp \
-	jit.cpp \
-	repl.hpp \
-	repl.cpp
+lilac_LDADD = -lLLVM
 
-lila_LDADD = liblilac.a -lLLVM
-
-lilac_SOURCES = lilac.cpp
-lilac_LDADD = liblilac.a -lLLVM
-
-noinst_LIBRARIES = liblilac.a
-
-liblilac_a_SOURCES = \
+lilac_SOURCES = \
 	ast.hpp \
 	codegen.hpp \
 	codegen.cpp \
@@ -24,4 +12,5 @@ liblilac_a_SOURCES = \
 	lexer.cpp \
 	parser.hpp \
 	parser.cpp \
-	token.hpp
+	token.hpp \
+	lilac.cpp

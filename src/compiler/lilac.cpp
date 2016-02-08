@@ -138,7 +138,7 @@ int main(int argc, char** argv) {
 
   CodeGen codegen("lilamodule", llvm::getGlobalContext());
 
-  auto cgresult = codegen.generateCode(move(ast), true);
+  auto cgresult = codegen.generateCode(move(ast));
 
   if (auto failure = dynamic_cast<CodegenFailure*>(cgresult.get())) {
     cerr << "[codegen] [error] " << failure->msg << endl;

@@ -17,6 +17,8 @@ namespace lila {
     llvm::Value* CodeGen::generateCodeExpr(ExprAST *ast) {
       if (auto x = dynamic_cast<NumberExprAST*>(ast)) {
         return generateCodeNumber(x);
+      } else if (auto x = dynamic_cast<CallValueAST*>(ast)) {
+        return generateCodeCallValue(x);
       } else if (auto x = dynamic_cast<BinaryExprAST*>(ast)) {
         return generateCodeBinOp(x);
       } else {
@@ -47,41 +49,56 @@ namespace lila {
       return nullptr;
     }
 
-    llvm::Function * CodeGen::wrapInFunc(llvm::Value *code, string name) {
-      // Make the function type:  double(void)
-      vector<llvm::Type *> args;
-      llvm::FunctionType *FT = llvm::FunctionType::get(llvm::Type::getDoubleTy(context), args, false);
-
-      llvm::Function *TheFunction =
-        llvm::Function::Create(FT, llvm::Function::ExternalLinkage, name, module.get());
-
-      // Create a new basic block to start insertion into.
-      llvm::BasicBlock *BB = llvm::BasicBlock::Create(context, "entry", TheFunction);
-      Builder.SetInsertPoint(BB);
-
-      Builder.CreateRet(code);
-
-      verifyFunction(*TheFunction);
-
-      return TheFunction;
+    llvm::Value * CodeGen::generateCodeValue(ValueAST *ast) {
+      llvm::Value * exprCode = generateCodeExpr(ast->expr.get());
+      values[ast->name] = exprCode;
+      return exprCode;
     }
 
-    void CodeGen::wrapInMain(llvm::Value *code) {
-      // generate a function
-      llvm::Function * TheFunction = wrapInFunc(code, "anonymous");
+    llvm::Value * CodeGen::generateCodeCallValue(CallValueAST *ast) {
+      return values[ast->name];
+    }
+
+    int CodeGen::wrapTopLevelBlockInMain(BlockAST *ast) {
+      vector<unique_ptr<ASTNode>> * body = ast->body.get();
 
       // generate void main()
       llvm::FunctionType *voidType = llvm::FunctionType::get(Builder.getVoidTy(), false);
       llvm::Function *mainFunc =
         llvm::Function::Create(voidType, llvm::Function::ExternalLinkage, "main", module.get());
 
-      llvm::BasicBlock *MainBlock = llvm::BasicBlock::Create(context, "mainentry1", mainFunc);
+      // basic block for the top level block
+      llvm::BasicBlock *MainBlock = llvm::BasicBlock::Create(context, "entry", mainFunc);
       Builder.SetInsertPoint(MainBlock);
 
-      // call the function inside main
-      std::vector<llvm::Value *> ArgsV;
+      llvm::Value * lastExpr;
 
-      auto bippy = Builder.CreateCall(TheFunction, ArgsV, "calltmp");
+      for (auto it = body->begin() ; it != body->end(); ++it) {
+        ASTNode * node = it->get();
+        llvm::Value * code;
+
+        if (auto x = dynamic_cast<ValueAST*>(node)) {
+          code = generateCodeValue(x);
+
+        } else if (auto x = dynamic_cast<NumberExprAST*>(node)) {
+          code = generateCodeNumber(x);
+          lastExpr = code;
+
+        } else if (auto x = dynamic_cast<BinaryExprAST*>(node)) {
+          code = generateCodeBinOp(x);
+          lastExpr = code;
+
+        } else if (auto x = dynamic_cast<CallValueAST*>(node)) {
+          code = generateCodeCallValue(x);
+          lastExpr = code;
+
+        } else {
+          error = "can't handle ast";
+          return 0;
+        }
+
+        if (!code) return 0;
+      }
 
       llvm::Value *fmt = Builder.CreateGlobalStringPtr("%f\n");
 
@@ -95,30 +112,25 @@ namespace lila {
 
       vector<llvm::Value *> CallArgs;
       CallArgs.push_back(fmt);
-      CallArgs.push_back(bippy);
-      Builder.CreateCall(putsFunc, CallArgs, "oo");
+      CallArgs.push_back(lastExpr);
+      Builder.CreateCall(putsFunc, CallArgs);
 
       Builder.CreateRetVoid();
 
       // Validate the generated code, checking for consistency.
       verifyFunction(*mainFunc);
+
+      return 1;
     }
 
-    unique_ptr<CodegenResult> CodeGen::generateCode(unique_ptr<ASTNode> ast, bool wrap) {
-      if (auto x = dynamic_cast<NumberExprAST*>(ast.get())) {
-        auto code = generateCodeNumber(x);
-        if (!code) {
+    unique_ptr<CodegenResult> CodeGen::generateCode(unique_ptr<ASTNode> ast) {
+      // top level block
+      if (auto block = dynamic_cast<BlockAST*>(ast.get())) {
+        if (!wrapTopLevelBlockInMain(block)) {
           auto failure = llvm::make_unique<CodegenFailure>(error);
           return move(failure);
         }
-        if (wrap) wrapInMain(code); else wrapInFunc(code, "anonymous");
-      } else if (auto x = dynamic_cast<BinaryExprAST*>(ast.get())) {
-        auto code = generateCodeBinOp(x);
-        if (!code) {
-          auto failure = llvm::make_unique<CodegenFailure>(error);
-          return move(failure);
-        }
-        if (wrap) wrapInMain(code); else wrapInFunc(code, "anonymous");
+
       } else {
         auto failure = llvm::make_unique<CodegenFailure>("can't handle ast");
         return move(failure);

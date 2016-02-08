@@ -12,8 +12,11 @@ MEMCHECK_OUT=$(mktemp)
 trap "rm -f $MEMCHECK_OUT" EXIT
 
 valgrind --tool=memcheck --leak-check=full --track-origins=yes --error-exitcode=1 \
-  $LILAC -o /dev/null <<< '20 + 22' \
-    2> $MEMCHECK_OUT
+$LILAC -v -o /dev/null 2> $MEMCHECK_OUT << EOF
+val a = 10 + 10
+val b = (a + 1) * 2
+b
+EOF
 
 VALGRIND_EXIT_STATUS=$?
 

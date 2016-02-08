@@ -1,6 +1,6 @@
 TESTS = \
 	lilac-simple.sh \
-	lila-memcheck.sh \
+	lilac-top-level-block.sh \
 	lilac-memcheck.sh
 
 EXTRA_DIST = $(TESTS)

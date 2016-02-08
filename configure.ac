@@ -11,7 +11,6 @@ AM_INIT_AUTOMAKE([foreign])
 
 # Checks for programs.
 AC_PROG_CXX
-AC_PROG_RANLIB
 
 # Checks for libraries.
 
