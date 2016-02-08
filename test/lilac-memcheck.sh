@@ -5,7 +5,7 @@ if ! which valgrind &> /dev/null ; then
   exit 77
 fi
 
-LILAC=../src/compiler/lilac
+LILAC=../src/bootstrap/lilac
 
 MEMCHECK_OUT=$(mktemp)
 

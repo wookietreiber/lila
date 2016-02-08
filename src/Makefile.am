@@ -1,1 +1,1 @@
-SUBDIRS = compiler
+SUBDIRS = bootstrap
