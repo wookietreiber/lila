@@ -7,6 +7,8 @@
 
 #include "codegen.hpp"
 
+#include <llvm/Support/raw_ostream.h>
+
 namespace lila {
   namespace codegen {
 
@@ -63,7 +65,13 @@ namespace lila {
       if (llvm::Value * result = generateCodeExpr(ast->body.get())) {
         Builder.CreateRet(result);
 
-        verifyFunction(*func);
+        string verifyS;
+        llvm::raw_string_ostream verifyE(verifyS);
+        if (verifyFunction(*func, &verifyE)) {
+          func->eraseFromParent();
+          error = "something wrong with function \"" + ast->name + "\": " + verifyS;
+          return nullptr;
+        }
 
         return func;
       } else {
@@ -153,8 +161,13 @@ namespace lila {
 
       Builder.CreateRetVoid();
 
-      // Validate the generated code, checking for consistency.
-      verifyFunction(*mainFunc);
+      string verifyS;
+      llvm::raw_string_ostream verifyE(verifyS);
+      if (verifyFunction(*mainFunc, &verifyE)) {
+        mainFunc->eraseFromParent();
+        error = "something wrong with auto-generated main function: " + verifyS;
+        return 0;
+      }
 
       return 1;
     }
