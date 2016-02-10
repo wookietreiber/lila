@@ -17,8 +17,8 @@ namespace lila {
     llvm::Value* CodeGen::generateCodeExpr(ExprAST *ast) {
       if (auto x = dynamic_cast<NumberExprAST*>(ast)) {
         return generateCodeNumber(x);
-      } else if (auto x = dynamic_cast<CallValueAST*>(ast)) {
-        return generateCodeCallValue(x);
+      } else if (auto x = dynamic_cast<CallAST*>(ast)) {
+        return generateCodeCall(x);
       } else if (auto x = dynamic_cast<BinaryExprAST*>(ast)) {
         return generateCodeBinOp(x);
       } else {
@@ -49,14 +49,45 @@ namespace lila {
       return nullptr;
     }
 
+    llvm::Function * CodeGen::generateCodeDef(DefAST *ast) {
+      vector<llvm::Type *> args;
+      llvm::FunctionType *funcType =
+        llvm::FunctionType::get(llvm::Type::getDoubleTy(context), args, false);
+
+      llvm::Function * func =
+        llvm::Function::Create(funcType, llvm::Function::ExternalLinkage, ast->name, module.get());
+
+      llvm::BasicBlock *block = llvm::BasicBlock::Create(context, "entry", func);
+      Builder.SetInsertPoint(block);
+
+      if (llvm::Value * result = generateCodeExpr(ast->body.get())) {
+        Builder.CreateRet(result);
+
+        verifyFunction(*func);
+
+        return func;
+      } else {
+        func->eraseFromParent();
+        error = "error creating function body: " + error;
+        return nullptr;
+      }
+    }
+
     llvm::Value * CodeGen::generateCodeValue(ValueAST *ast) {
       llvm::Value * exprCode = generateCodeExpr(ast->expr.get());
       values[ast->name] = exprCode;
       return exprCode;
     }
 
-    llvm::Value * CodeGen::generateCodeCallValue(CallValueAST *ast) {
-      return values[ast->name];
+    llvm::Value * CodeGen::generateCodeCall(CallAST *ast) {
+      if (auto value = values[ast->name]) {
+        return value;
+      } else if (auto function = module->getFunction(ast->name)) {
+        std::vector<llvm::Value*> args;
+        return Builder.CreateCall(function, args, "call" + ast->name);
+      } else {
+        return nullptr;
+      }
     }
 
     int CodeGen::wrapTopLevelBlockInMain(BlockAST *ast) {
@@ -75,29 +106,34 @@ namespace lila {
 
       for (auto it = body->begin() ; it != body->end(); ++it) {
         ASTNode * node = it->get();
-        llvm::Value * code;
 
         if (auto x = dynamic_cast<ValueAST*>(node)) {
-          code = generateCodeValue(x);
+          auto code = generateCodeValue(x);
+          if (!code) return 0;
+
+        } else if (auto x = dynamic_cast<DefAST*>(node)) {
+          generateCodeDef(x);
+          Builder.SetInsertPoint(MainBlock);
 
         } else if (auto x = dynamic_cast<NumberExprAST*>(node)) {
-          code = generateCodeNumber(x);
+          auto code = generateCodeNumber(x);
+          if (!code) return 0;
           lastExpr = code;
 
         } else if (auto x = dynamic_cast<BinaryExprAST*>(node)) {
-          code = generateCodeBinOp(x);
+          auto code = generateCodeBinOp(x);
+          if (!code) return 0;
           lastExpr = code;
 
-        } else if (auto x = dynamic_cast<CallValueAST*>(node)) {
-          code = generateCodeCallValue(x);
+        } else if (auto x = dynamic_cast<CallAST*>(node)) {
+          auto code = generateCodeCall(x);
+          if (!code) return 0;
           lastExpr = code;
 
         } else {
           error = "can't handle ast";
           return 0;
         }
-
-        if (!code) return 0;
       }
 
       llvm::Value *fmt = Builder.CreateGlobalStringPtr("%f\n");

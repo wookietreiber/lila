@@ -104,7 +104,7 @@ namespace lila {
     }
 
     unique_ptr<ExprAST> Parser::parseIdentifier(string name) {
-      auto ast = llvm::make_unique<CallValueAST>(name);
+      auto ast = llvm::make_unique<CallAST>(name);
       return move(ast);
     }
 
@@ -157,6 +157,45 @@ namespace lila {
       return ast;
     }
 
+    // def name = expr
+    unique_ptr<DefAST> Parser::parseDef() {
+      string name;
+
+      nextToken(); // eat "def" token
+
+      if (auto t = dynamic_cast<OtherToken*>(curtok)) {
+        name = t->value;
+      } else {
+        error = "expected value name";
+        return nullptr;
+      }
+
+      nextToken(); // eat name of value token
+
+      if (!dynamic_cast<AssignmentToken*>(curtok)) {
+        error = "expected \"=\"";
+        return nullptr;
+      }
+
+      nextToken(); // eat "=" token
+
+      auto expr = parseExpression();
+
+      if (!expr) {
+        error = "expected expression: " + error;
+        return nullptr;
+      }
+
+      if (names.find(name) != names.end()) {
+        error = name + " is already defined";
+        return nullptr;
+      }
+
+      names[name] = name;
+      auto ast = llvm::make_unique<DefAST>(name, move(expr));
+      return ast;
+    }
+
     unique_ptr<ExprAST> Parser::parseTopLevelBlock(unique_ptr<ASTNode> first) {
       auto body = llvm::make_unique<vector<unique_ptr<ASTNode>>>();
       body->push_back(move(first));
@@ -195,6 +234,9 @@ namespace lila {
       while (nextToken()) {
         if (dynamic_cast<NewlineToken*>(curtok)) {
           continue;
+        } else if (dynamic_cast<DefToken*>(curtok)) {
+          auto ast = parseDef();
+          curast = parseTopLevelBlock(move(ast));
         } else if (dynamic_cast<ValueToken*>(curtok)) {
           auto ast = parseValue();
           curast = parseTopLevelBlock(move(ast));

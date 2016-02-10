@@ -1,4 +1,5 @@
 TESTS = \
+	lilac-parenless-def.sh \
 	lilac-simple.sh \
 	lilac-top-level-block.sh \
 	lilac-memcheck.sh

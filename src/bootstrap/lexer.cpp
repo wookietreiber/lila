@@ -56,7 +56,10 @@ namespace lila {
           while (is && is->get(c) && isalnum(c))
             str += c;
 
-          if (str.compare("val") == 0) {
+          if (str.compare("def") == 0) {
+            auto token = llvm::make_unique<DefToken>();
+            tokens->push_back(move(token));
+          } else if (str.compare("val") == 0) {
             auto valueToken = llvm::make_unique<ValueToken>();
             tokens->push_back(move(valueToken));
           } else {

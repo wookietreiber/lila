@@ -55,8 +55,9 @@ namespace lila {
       llvm::Value * generateCodeExpr(ExprAST *ast);
       llvm::Value * generateCodeNumber(NumberExprAST *ast);
       llvm::Value * generateCodeBinOp(BinaryExprAST *ast);
-      llvm::Value * generateCodeCallValue(CallValueAST *ast);
+      llvm::Value * generateCodeCall(CallAST *ast);
       llvm::Value * generateCodeValue(ValueAST *ast);
+      llvm::Function * generateCodeDef(DefAST *ast);
 
       int wrapTopLevelBlockInMain(BlockAST *ast);
 

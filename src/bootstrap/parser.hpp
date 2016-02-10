@@ -75,6 +75,7 @@ namespace lila {
       unique_ptr<ExprAST> parseIdentifier(string name);
       unique_ptr<ExprAST> parseTopLevelBlock(unique_ptr<ASTNode> first);
       unique_ptr<ValueAST> parseValue();
+      unique_ptr<DefAST> parseDef();
 
     public:
       explicit Parser(vector<unique_ptr<Token>>* tokens) : tokens(tokens) {

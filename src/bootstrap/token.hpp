@@ -60,6 +60,14 @@ namespace lila {
       }
     };
 
+    class DefToken : public Token {
+    public:
+      explicit DefToken() {}
+      string toString() {
+        return "def";
+      }
+    };
+
     class AssignmentToken : public Token {
     public:
       explicit AssignmentToken() {}

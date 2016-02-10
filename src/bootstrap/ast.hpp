@@ -59,10 +59,20 @@ namespace lila {
       }
     };
 
-    class CallValueAST : public ExprAST {
+    class DefAST : public ASTNode {
     public:
       string name;
-      explicit CallValueAST(string name) : name(name) {}
+      unique_ptr<ExprAST> body;
+      explicit DefAST(string name, unique_ptr<ExprAST> body) : name(name), body(move(body)) {}
+      string toString() {
+        return "def " + name + " = " + body->toString();
+      }
+    };
+
+    class CallAST : public ExprAST {
+    public:
+      string name;
+      explicit CallAST(string name) : name(name) {}
       string toString() {
         return name;
       }
