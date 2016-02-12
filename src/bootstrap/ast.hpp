@@ -84,12 +84,12 @@ namespace lila {
       explicit BlockAST(unique_ptr<vector<unique_ptr<ASTNode> > > body) : body(move(body)) {}
       string toString() {
         ostringstream oss;
-        oss << "{" << endl;
+        oss << '{' << endl;
         for (auto it = body->begin() ; it != body->end(); ++it) {
           ASTNode * ast = it->get();
           oss << "  " << ast->toString() << endl;
         }
-        oss << "}" << endl;
+        oss << '}' << endl;
         return oss.str();
       }
     };
