@@ -25,5 +25,6 @@ AC_FUNC_STRTOD
 AC_CONFIG_FILES([Makefile
                  src/Makefile
                  src/bootstrap/Makefile
-                 test/Makefile])
+                 test/Makefile
+                 test/test-compilation.sh])
 AC_OUTPUT

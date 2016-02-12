@@ -1,0 +1,24 @@
+#!/bin/bash
+
+function test_compilation {
+  EXPECTED_RESULT=$1
+
+  LILAC=../src/bootstrap/lilac
+
+  OBJECT=$(mktemp)
+  LINKED=$(mktemp)
+
+  trap "rm -f $OBJECT $LINKED" EXIT
+
+  $LILAC -v -o $OBJECT
+
+  @CC@ -o $LINKED $OBJECT
+
+  RESULT=$($LINKED)
+
+  if [[ $RESULT == $EXPECTED_RESULT ]] ; then
+    return 0
+  else
+    return 1
+  fi
+}

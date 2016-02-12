@@ -12,7 +12,7 @@ MEMCHECK_OUT=$(mktemp)
 trap "rm -f $MEMCHECK_OUT" EXIT
 
 valgrind --tool=memcheck --leak-check=full --track-origins=yes --error-exitcode=1 \
-$LILAC -v -o /dev/null 2> $MEMCHECK_OUT << EOF
+$LILAC -v -o /dev/null &> $MEMCHECK_OUT << EOF
 def foo = 2
 val a = 10 + 8 + foo
 val b = (a + 1) * foo
