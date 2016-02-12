@@ -31,7 +31,7 @@ namespace lila {
 
     public:
       double value;
-      explicit NumberExprAST(double value) : value(value) {}
+      explicit NumberExprAST(const double &value) : value(value) {}
       string toString() {
         return to_string(value);
       }
@@ -42,7 +42,7 @@ namespace lila {
     public:
       string op;
       unique_ptr<ExprAST> lhs, rhs;
-      explicit BinaryExprAST(string op, unique_ptr<ExprAST> lhs, unique_ptr<ExprAST> rhs)
+      explicit BinaryExprAST(const string &op, unique_ptr<ExprAST> lhs, unique_ptr<ExprAST> rhs)
         : op(op), lhs(move(lhs)), rhs(move(rhs)) {}
       string toString() {
         return '(' + lhs->toString() + ' ' + op + ' ' + rhs->toString() + ')';
@@ -53,7 +53,8 @@ namespace lila {
     public:
       string name;
       unique_ptr<ExprAST> expr;
-      explicit ValueAST(string name, unique_ptr<ExprAST> expr) : name(name), expr(move(expr)) {}
+      explicit ValueAST(const string &name, unique_ptr<ExprAST> expr)
+        : name(name), expr(move(expr)) {}
       string toString() {
         return "val " + name + " = " + expr->toString();
       }
@@ -63,7 +64,8 @@ namespace lila {
     public:
       string name;
       unique_ptr<ExprAST> body;
-      explicit DefAST(string name, unique_ptr<ExprAST> body) : name(name), body(move(body)) {}
+      explicit DefAST(const string &name, unique_ptr<ExprAST> body)
+        : name(name), body(move(body)) {}
       string toString() {
         return "def " + name + " = " + body->toString();
       }
@@ -72,7 +74,7 @@ namespace lila {
     class CallAST : public ExprAST {
     public:
       string name;
-      explicit CallAST(string name) : name(name) {}
+      explicit CallAST(const string &name) : name(name) {}
       string toString() {
         return name;
       }

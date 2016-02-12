@@ -21,7 +21,7 @@ namespace lila {
     class NumberToken : public Token {
     public:
       double value;
-      explicit NumberToken(double value) : value(value) {}
+      explicit NumberToken(const double &value) : value(value) {}
       string toString() {
         return to_string(value);
       }
@@ -30,7 +30,7 @@ namespace lila {
     class OtherToken : public Token {
     public:
       string name;
-      explicit OtherToken(string name) : name(name) {}
+      explicit OtherToken(const string &name) : name(name) {}
       string toString() {
         return name;
       }
