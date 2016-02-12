@@ -52,6 +52,14 @@ namespace lila {
       }
     };
 
+    class CommaToken : public Token {
+    public:
+      explicit CommaToken() {}
+      string toString() {
+        return ",";
+      }
+    };
+
     class ValueToken : public Token {
     public:
       explicit ValueToken() {}

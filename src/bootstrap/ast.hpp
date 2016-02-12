@@ -63,20 +63,50 @@ namespace lila {
     class DefAST : public ASTNode {
     public:
       string name;
+      vector<string> args;
       unique_ptr<ExprAST> body;
-      explicit DefAST(const string &name, unique_ptr<ExprAST> body)
-        : name(name), body(move(body)) {}
+      explicit DefAST(const string &name, const vector<string> &args, unique_ptr<ExprAST> body)
+        : name(name), args(args), body(move(body)) {}
       string toString() {
-        return "def " + name + " = " + body->toString();
+        ostringstream oss;
+
+        oss << "def " << name;
+
+        if (!args.empty()) {
+          oss << '(';
+          auto size = args.size();
+          for (unsigned i = 0; i < size; i++) {
+            oss << args[i];
+            if (i < (size - 1)) oss << ", ";
+          }
+          oss << ')';
+        }
+
+        oss << " = " << body->toString();
+
+        return oss.str();
       }
     };
 
     class CallAST : public ExprAST {
     public:
       string name;
-      explicit CallAST(const string &name) : name(name) {}
+      unique_ptr<vector<unique_ptr<ExprAST> > > args;
+      explicit CallAST(const string &name, unique_ptr<vector<unique_ptr<ExprAST> > > args)
+        : name(name), args(move(args)) {}
       string toString() {
-        return name;
+        ostringstream oss;
+        oss << name;
+        if (!args->empty()) {
+          oss << '(';
+          auto size = args->size();
+          for (unsigned i = 0; i < size; i++) {
+            oss << args->at(i)->toString();
+            if (i < (size - 1)) oss << ", ";
+          }
+          oss << ')';
+        }
+        return oss.str();
       }
     };
 

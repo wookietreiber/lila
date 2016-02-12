@@ -67,6 +67,11 @@ namespace lila {
             tokens->push_back(move(otherToken));
           }
 
+        } else if (c == ',') {
+          auto comma = llvm::make_unique<CommaToken>();
+          tokens->push_back(move(comma));
+          is->get(c);
+
         } else if (c == '(') {
           parens++;
           auto parenopen = llvm::make_unique<ParenOpen>();

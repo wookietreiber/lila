@@ -12,6 +12,7 @@ namespace lila {
 
     unique_ptr<ExprAST> Parser::parseNumberExpr(NumberToken* tok) {
       double number = tok->value;
+      nextToken();
       auto numberast = llvm::make_unique<NumberExprAST>(number);
       return move(numberast);
     }
@@ -35,8 +36,6 @@ namespace lila {
           if (!rhs)
             return nullptr;
 
-          nextToken();
-
           if (!curtok)
             return llvm::make_unique<BinaryExprAST>(op->name, move(lhs), move(rhs));
 
@@ -54,18 +53,22 @@ namespace lila {
 
             // Merge lhs/rhs.
             lhs = llvm::make_unique<BinaryExprAST>(op->name, move(lhs), move(rhs));
+          } else if (dynamic_cast<CommaToken*>(curtok)) {
+            return llvm::make_unique<BinaryExprAST>(op->name, move(lhs), move(rhs));
           } else if (dynamic_cast<NewlineToken*>(curtok)) {
             return llvm::make_unique<BinaryExprAST>(op->name, move(lhs), move(rhs));
           } else if (dynamic_cast<ParenClose*>(curtok)) {
             return llvm::make_unique<BinaryExprAST>(op->name, move(lhs), move(rhs));
           }
 
-        } else if (dynamic_cast<ParenClose*>(curtok)) {
+        } else if (dynamic_cast<CommaToken*>(curtok)) {
           return lhs;
         } else if (dynamic_cast<NewlineToken*>(curtok)) {
           return lhs;
+        } else if (dynamic_cast<ParenClose*>(curtok)) {
+          return lhs;
         } else {
-          error = "unknown token when expecting an operation";
+          error = "unknown token \"" + curtok->toString() + "\" when expecting an operation";
           return nullptr;
         }
       }
@@ -74,10 +77,14 @@ namespace lila {
     }
 
     unique_ptr<ExprAST> Parser::parseParenExpr() {
-      nextToken();
+      nextToken(); // eat (
       auto expr = parseExpression();
+      if (!expr) {
+        return nullptr;
+      }
 
       if (dynamic_cast<ParenClose*>(curtok)) {
+        nextToken(); // eat )
         return expr;
       } else {
         error = "expected ')'";
@@ -94,23 +101,65 @@ namespace lila {
         if (names.find(t->name) != names.end()) {
           return parseIdentifier(t->name);
         } else {
-          error = "unknown token when expecting an expression";
+          error = "unknown token \"" + curtok->toString() + "\" when expecting primary";
           return nullptr;
         }
       } else {
-        error = "unknown token when expecting an expression";
+        error = "unknown token \"" + curtok->toString() + "\" when expecting primary";
         return nullptr;
       }
     }
 
     unique_ptr<ExprAST> Parser::parseIdentifier(string name) {
-      auto ast = llvm::make_unique<CallAST>(name);
+      auto args = llvm::make_unique<vector<unique_ptr<ExprAST> > >();
+
+      nextToken();
+
+      if (dynamic_cast<ParenOpen*>(curtok)) {
+        nextToken(); // eat "(" token
+        bool expectarg = true;
+
+        while (curtok) {
+          if (dynamic_cast<ParenClose*>(curtok)) {
+            if (expectarg) {
+              error = "expecting an argument";
+              return nullptr;
+            } else {
+              break;
+            }
+          } else if (dynamic_cast<CommaToken*>(curtok)) {
+            nextToken();
+            if (expectarg) {
+              error = "expecting an argument";
+              return nullptr;
+            } else {
+              expectarg = true;
+            }
+          } else {
+            if (expectarg) {
+              auto expr = parseExpression();
+              if (!expr) {
+                error = "expected expression as argument: " + error;
+                return nullptr;
+              }
+              args->push_back(move(expr));
+              expectarg = false;
+            } else {
+              error = "didn't expect another argument";
+              return nullptr;
+            }
+          }
+        }
+
+        nextToken(); // eat ")" token
+      }
+
+      auto ast = llvm::make_unique<CallAST>(name, move(args));
       return move(ast);
     }
 
     unique_ptr<ExprAST> Parser::parseExpression() {
       auto lhs = parsePrimary();
-      nextToken();
 
       if (!lhs)
         return nullptr;
@@ -152,7 +201,8 @@ namespace lila {
         return nullptr;
       }
 
-      names[name] = name;
+      vector<string> emptyargs;
+      names[name] = emptyargs;
       auto ast = llvm::make_unique<ValueAST>(name, move(expr));
       return ast;
     }
@@ -160,17 +210,71 @@ namespace lila {
     // def name = expr
     unique_ptr<DefAST> Parser::parseDef() {
       string name;
+      vector<string> args;
 
       nextToken(); // eat "def" token
 
       if (auto t = dynamic_cast<OtherToken*>(curtok)) {
         name = t->name;
+
+        if (names.find(name) != names.end()) {
+          error = name + " is already defined";
+          return nullptr;
+        }
       } else {
-        error = "expected value name";
+        error = "expected def name";
         return nullptr;
       }
 
       nextToken(); // eat name of value token
+
+      if (dynamic_cast<ParenOpen*>(curtok)) {
+        nextToken(); // eat "(" token
+        bool expectarg = true;
+
+        while (curtok) {
+          if (dynamic_cast<ParenClose*>(curtok)) {
+            if (expectarg) {
+              error = "expecting an argument";
+              return nullptr;
+            } else {
+              break;
+            }
+          } else if (auto t = dynamic_cast<OtherToken*>(curtok)) {
+            if (expectarg) {
+              string name = t->name;
+
+              if (names.find(name) != names.end()) {
+                error = name + " is already defined";
+                return nullptr;
+              }
+
+              vector<string> emptyargs;
+              names[name] = emptyargs;
+
+              args.push_back(name);
+              expectarg = false;
+            } else {
+              error = "didn't expect another argument";
+              return nullptr;
+            }
+          } else if (dynamic_cast<CommaToken*>(curtok)) {
+            if (expectarg) {
+              error = "expecting an argument";
+              return nullptr;
+            } else {
+              expectarg = true;
+            }
+          } else {
+            error = "expected arguments or end of arguments, i.e. \")\"";
+            return nullptr;
+          }
+
+          nextToken();
+        }
+
+        nextToken(); // eat ")" token
+      }
 
       if (!dynamic_cast<AssignmentToken*>(curtok)) {
         error = "expected \"=\"";
@@ -191,8 +295,8 @@ namespace lila {
         return nullptr;
       }
 
-      names[name] = name;
-      auto ast = llvm::make_unique<DefAST>(name, move(expr));
+      names[name] = args;
+      auto ast = llvm::make_unique<DefAST>(name, args, move(expr));
       return ast;
     }
 
@@ -236,6 +340,10 @@ namespace lila {
           continue;
         } else if (dynamic_cast<DefToken*>(curtok)) {
           auto ast = parseDef();
+          if (!ast) {
+            auto failure = llvm::make_unique<ParserFailure>(error);
+            return move(failure);
+          }
           curast = parseTopLevelBlock(move(ast));
         } else if (dynamic_cast<ValueToken*>(curtok)) {
           auto ast = parseValue();
