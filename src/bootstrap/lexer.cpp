@@ -11,7 +11,7 @@ namespace lila {
   namespace lexer {
 
     unique_ptr<LexerResult> tokenize(basic_istream<char>* is) {
-      auto tokens = llvm::make_unique<vector<unique_ptr<Token>>>();
+      auto tokens = llvm::make_unique<vector<unique_ptr<Token> > >();
 
       unsigned int parens = 0;
       char c;

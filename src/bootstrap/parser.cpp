@@ -197,7 +197,7 @@ namespace lila {
     }
 
     unique_ptr<ExprAST> Parser::parseTopLevelBlock(unique_ptr<ASTNode> first) {
-      auto body = llvm::make_unique<vector<unique_ptr<ASTNode>>>();
+      auto body = llvm::make_unique<vector<unique_ptr<ASTNode> > >();
       body->push_back(move(first));
 
       unique_ptr<ASTNode> curast;

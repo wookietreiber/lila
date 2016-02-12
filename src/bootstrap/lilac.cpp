@@ -105,7 +105,7 @@ int main(int argc, char** argv) {
   }
 
   LexerSuccess * lexsuccess = dynamic_cast<LexerSuccess*>(lexerResult.get());
-  vector<unique_ptr<Token>> * tokens = lexsuccess->tokens.get();
+  vector<unique_ptr<Token> > * tokens = lexsuccess->tokens.get();
 
   if (verbose)
     for (auto it = tokens->begin() ; it != tokens->end(); ++it) {

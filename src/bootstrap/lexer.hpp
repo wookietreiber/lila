@@ -24,8 +24,8 @@ namespace lila {
 
     class LexerSuccess : public LexerResult {
     public:
-      unique_ptr<vector<unique_ptr<Token>>> tokens;
-      explicit LexerSuccess(unique_ptr<vector<unique_ptr<Token>>> tokens) : tokens(move(tokens)) {}
+      unique_ptr<vector<unique_ptr<Token> > > tokens;
+      explicit LexerSuccess(unique_ptr<vector<unique_ptr<Token> > > tokens) : tokens(move(tokens)) {}
     };
 
     class LexerFailure : public LexerResult {

@@ -38,11 +38,11 @@ namespace lila {
 
     class Parser {
     private:
-      vector<unique_ptr<Token>>* tokens;
+      vector<unique_ptr<Token> >* tokens;
       map<string, int> operatorPrecendences;
       map<string, string> names;
       Token * curtok;
-      vector<unique_ptr<Token>>::size_type pos = 0;
+      vector<unique_ptr<Token> >::size_type pos = 0;
       string error;
 
       int getPrecedence(string op) {
@@ -78,7 +78,7 @@ namespace lila {
       unique_ptr<DefAST> parseDef();
 
     public:
-      explicit Parser(vector<unique_ptr<Token>>* tokens) : tokens(tokens) {
+      explicit Parser(vector<unique_ptr<Token> >* tokens) : tokens(tokens) {
         operatorPrecendences["+"] = 20;
         operatorPrecendences["-"] = 20;
         operatorPrecendences["*"] = 40;

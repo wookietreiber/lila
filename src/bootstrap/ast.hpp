@@ -80,8 +80,8 @@ namespace lila {
 
     class BlockAST : public ExprAST {
     public:
-      unique_ptr<vector<unique_ptr<ASTNode>>> body;
-      explicit BlockAST(unique_ptr<vector<unique_ptr<ASTNode>>> body) : body(move(body)) {}
+      unique_ptr<vector<unique_ptr<ASTNode> > > body;
+      explicit BlockAST(unique_ptr<vector<unique_ptr<ASTNode> > > body) : body(move(body)) {}
       string toString() {
         ostringstream oss;
         oss << "{" << endl;

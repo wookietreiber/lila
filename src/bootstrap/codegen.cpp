@@ -99,7 +99,7 @@ namespace lila {
     }
 
     int CodeGen::wrapTopLevelBlockInMain(BlockAST *ast) {
-      vector<unique_ptr<ASTNode>> * body = ast->body.get();
+      vector<unique_ptr<ASTNode> > * body = ast->body.get();
 
       // generate void main()
       llvm::FunctionType *voidType = llvm::FunctionType::get(Builder.getVoidTy(), false);
