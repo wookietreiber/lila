@@ -20,7 +20,7 @@ namespace lila {
       while (curtok) {
         // expecting some op token
         if (auto op = dynamic_cast<OtherToken*>(curtok)) {
-          int opprec = getPrecedence(op->value);
+          int opprec = getPrecedence(op->name);
 
           if (opprec < prec)
             return lhs;
@@ -38,12 +38,12 @@ namespace lila {
           nextToken();
 
           if (!curtok)
-            return llvm::make_unique<BinaryExprAST>(op->value, move(lhs), move(rhs));
+            return llvm::make_unique<BinaryExprAST>(op->name, move(lhs), move(rhs));
 
           // if op binds less tightly with rhs than op after rhs, let
           // the pending op take rhs as its lhs
           if (auto nextop = dynamic_cast<OtherToken*>(curtok)) {
-            int nextprec = getPrecedence(nextop->value);
+            int nextprec = getPrecedence(nextop->name);
 
             if (opprec < nextprec) {
               rhs = parseBinOpRHS(move(rhs), opprec + 1);
@@ -53,11 +53,11 @@ namespace lila {
             }
 
             // Merge lhs/rhs.
-            lhs = llvm::make_unique<BinaryExprAST>(op->value, move(lhs), move(rhs));
+            lhs = llvm::make_unique<BinaryExprAST>(op->name, move(lhs), move(rhs));
           } else if (dynamic_cast<NewlineToken*>(curtok)) {
-            return llvm::make_unique<BinaryExprAST>(op->value, move(lhs), move(rhs));
+            return llvm::make_unique<BinaryExprAST>(op->name, move(lhs), move(rhs));
           } else if (dynamic_cast<ParenClose*>(curtok)) {
-            return llvm::make_unique<BinaryExprAST>(op->value, move(lhs), move(rhs));
+            return llvm::make_unique<BinaryExprAST>(op->name, move(lhs), move(rhs));
           }
 
         } else if (dynamic_cast<ParenClose*>(curtok)) {
@@ -91,8 +91,8 @@ namespace lila {
       } else if (dynamic_cast<ParenOpen*>(curtok)) {
         return parseParenExpr();
       } else if (auto t = dynamic_cast<OtherToken*>(curtok)) {
-        if (names.find(t->value) != names.end()) {
-          return parseIdentifier(t->value);
+        if (names.find(t->name) != names.end()) {
+          return parseIdentifier(t->name);
         } else {
           error = "unknown token when expecting an expression";
           return nullptr;
@@ -125,7 +125,7 @@ namespace lila {
       nextToken(); // eat "val" token
 
       if (auto t = dynamic_cast<OtherToken*>(curtok)) {
-        name = t->value;
+        name = t->name;
       } else {
         error = "expected value name";
         return nullptr;
@@ -164,7 +164,7 @@ namespace lila {
       nextToken(); // eat "def" token
 
       if (auto t = dynamic_cast<OtherToken*>(curtok)) {
-        name = t->value;
+        name = t->name;
       } else {
         error = "expected value name";
         return nullptr;

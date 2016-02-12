@@ -30,22 +30,22 @@ namespace lila {
     class NumberExprAST : public ExprAST {
 
     public:
-      double Val;
-      explicit NumberExprAST(double Val) : Val(Val) {}
+      double value;
+      explicit NumberExprAST(double value) : value(value) {}
       string toString() {
-        return to_string(Val);
+        return to_string(value);
       }
     };
 
     class BinaryExprAST : public ExprAST {
 
     public:
-      string Op;
-      unique_ptr<ExprAST> LHS, RHS;
-      explicit BinaryExprAST(string Op, unique_ptr<ExprAST> LHS, unique_ptr<ExprAST> RHS)
-        : Op(Op), LHS(move(LHS)), RHS(move(RHS)) {}
+      string op;
+      unique_ptr<ExprAST> lhs, rhs;
+      explicit BinaryExprAST(string op, unique_ptr<ExprAST> lhs, unique_ptr<ExprAST> rhs)
+        : op(op), lhs(move(lhs)), rhs(move(rhs)) {}
       string toString() {
-        return '(' + LHS->toString() + ' ' + Op + ' ' + RHS->toString() + ')';
+        return '(' + lhs->toString() + ' ' + op + ' ' + rhs->toString() + ')';
       }
     };
 

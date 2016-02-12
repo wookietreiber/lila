@@ -13,7 +13,7 @@ namespace lila {
   namespace codegen {
 
     llvm::Value* CodeGen::generateCodeNumber(NumberExprAST *ast) {
-      return llvm::ConstantFP::get(context, llvm::APFloat(ast->Val));
+      return llvm::ConstantFP::get(context, llvm::APFloat(ast->value));
     }
 
     llvm::Value* CodeGen::generateCodeExpr(ExprAST *ast) {
@@ -30,13 +30,13 @@ namespace lila {
     }
 
     llvm::Value* CodeGen::generateCodeBinOp(BinaryExprAST *ast) {
-      llvm::Value *L = generateCodeExpr(ast->LHS.get());
-      llvm::Value *R = generateCodeExpr(ast->RHS.get());
+      llvm::Value *L = generateCodeExpr(ast->lhs.get());
+      llvm::Value *R = generateCodeExpr(ast->rhs.get());
 
       if (!L || !R)
         return nullptr;
 
-      string op = ast->Op;
+      string op = ast->op;
 
       if (op == "+") {
         return Builder.CreateFAdd(L, R, "addtmp");

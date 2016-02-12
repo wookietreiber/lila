@@ -29,10 +29,10 @@ namespace lila {
 
     class OtherToken : public Token {
     public:
-      string value;
-      explicit OtherToken(string value) : value(value) {}
+      string name;
+      explicit OtherToken(string name) : name(name) {}
       string toString() {
-        return value;
+        return name;
       }
     };
 
