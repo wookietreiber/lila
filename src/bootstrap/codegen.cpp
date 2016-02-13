@@ -52,12 +52,18 @@ namespace lila {
     }
 
     llvm::Function * CodeGen::generateCodeDef(DefAST *ast) {
-      vector<llvm::Type *> args;
+      vector<llvm::Type*> args(ast->args.size(), llvm::Type::getDoubleTy(context));
       llvm::FunctionType *funcType =
         llvm::FunctionType::get(llvm::Type::getDoubleTy(context), args, false);
 
       llvm::Function * func =
         llvm::Function::Create(funcType, llvm::Function::ExternalLinkage, ast->name, module.get());
+
+      unsigned i = 0;
+      for (auto funcargs = func->arg_begin(); i != ast->args.size(); ++funcargs, ++i) {
+        funcargs->setName(ast->args[i]);
+        values[ast->args[i]] = funcargs;
+      }
 
       llvm::BasicBlock *block = llvm::BasicBlock::Create(context, "entry", func);
       Builder.SetInsertPoint(block);
@@ -91,9 +97,22 @@ namespace lila {
       if (auto value = values[ast->name]) {
         return value;
       } else if (auto function = module->getFunction(ast->name)) {
-        std::vector<llvm::Value*> args;
+        if (function->arg_size() != ast->args->size()) {
+          error = "incorrect number of arguments";
+          return nullptr;
+        }
+
+        vector<llvm::Value*> args;
+        for (unsigned i = 0, e = ast->args->size(); i != e; ++i) {
+          ExprAST * expr = ast->args->at(i).get();
+          llvm::Value * value = generateCodeExpr(expr);
+          if (!value) return nullptr;
+          args.push_back(value);
+        }
+
         return Builder.CreateCall(function, args, "call" + ast->name);
       } else {
+        error = ast->name + " not found";
         return nullptr;
       }
     }

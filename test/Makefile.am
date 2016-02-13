@@ -1,4 +1,5 @@
 TESTS = \
+	lilac-def.sh \
 	lilac-parenless-def.sh \
 	lilac-simple.sh \
 	lilac-top-level-block.sh \
