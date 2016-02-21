@@ -23,6 +23,7 @@ namespace lila {
         return generateCodeCall(x);
       } else if (auto x = dynamic_cast<BinaryExprAST*>(ast)) {
         return generateCodeBinOp(x);
+      // TODO handle block with scopes
       } else {
         error = "can't handle expression ast";
         return nullptr;

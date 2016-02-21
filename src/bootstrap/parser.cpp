@@ -10,6 +10,58 @@
 namespace lila {
   namespace parser {
 
+    unique_ptr<ExprAST> Parser::parseBlock() {
+      auto body = llvm::make_unique<vector<unique_ptr<ASTNode> > >();
+      unique_ptr<ASTNode> curast;
+      indent++;
+
+      while (nextToken()) {
+        if (dynamic_cast<BlockClose*>(curtok)) {
+          break;
+        } else if (dynamic_cast<NewlineToken*>(curtok)) {
+          continue;
+        } else if (dynamic_cast<DefToken*>(curtok)) {
+          curast = parseDef();
+        } else if (dynamic_cast<ValueToken*>(curtok)) {
+          curast = parseValue();
+        } else {
+          curast = parseExpression();
+        }
+
+        if (!curast) return nullptr;
+
+        body->push_back(move(curast));
+
+        if (dynamic_cast<BlockClose*>(curtok)) {
+          break;
+        }
+      }
+
+      if (!dynamic_cast<BlockClose*>(curtok)) {
+        error = "expected '}'";
+        return nullptr;
+      }
+
+      nextToken(); // eat }
+
+      if (!dynamic_cast<ExprAST*>(body->back().get())) {
+        error = "block does not end in expression";
+        return nullptr;
+      }
+
+      if (body->size() == 1) {
+        // safe cast because last piece of body is expression (checked before)
+        ExprAST * e = dynamic_cast<ExprAST*>(body->back().release());
+        auto expr = unique_ptr<ExprAST>(e);
+        indent--;
+        return expr;
+      } else {
+        auto block = llvm::make_unique<BlockAST>(move(body), indent);
+        indent--;
+        return move(block);
+      }
+    }
+
     unique_ptr<ExprAST> Parser::parseNumberExpr(NumberToken* tok) {
       double number = tok->value;
       nextToken();
@@ -57,6 +109,8 @@ namespace lila {
             return llvm::make_unique<BinaryExprAST>(op->name, move(lhs), move(rhs));
           } else if (dynamic_cast<NewlineToken*>(curtok)) {
             return llvm::make_unique<BinaryExprAST>(op->name, move(lhs), move(rhs));
+          } else if (dynamic_cast<BlockClose*>(curtok)) {
+            return llvm::make_unique<BinaryExprAST>(op->name, move(lhs), move(rhs));
           } else if (dynamic_cast<ParenClose*>(curtok)) {
             return llvm::make_unique<BinaryExprAST>(op->name, move(lhs), move(rhs));
           }
@@ -64,6 +118,8 @@ namespace lila {
         } else if (dynamic_cast<CommaToken*>(curtok)) {
           return lhs;
         } else if (dynamic_cast<NewlineToken*>(curtok)) {
+          return lhs;
+        } else if (dynamic_cast<BlockClose*>(curtok)) {
           return lhs;
         } else if (dynamic_cast<ParenClose*>(curtok)) {
           return lhs;
@@ -95,6 +151,8 @@ namespace lila {
     unique_ptr<ExprAST> Parser::parsePrimary() {
       if (auto t = dynamic_cast<NumberToken*>(curtok)) {
         return parseNumberExpr(t);
+      } else if (dynamic_cast<BlockOpen*>(curtok)) {
+        return parseBlock();
       } else if (dynamic_cast<ParenOpen*>(curtok)) {
         return parseParenExpr();
       } else if (auto t = dynamic_cast<OtherToken*>(curtok)) {
@@ -302,8 +360,8 @@ namespace lila {
 
     unique_ptr<ExprAST> Parser::parseTopLevelBlock() {
       auto body = llvm::make_unique<vector<unique_ptr<ASTNode> > >();
-
       unique_ptr<ASTNode> curast;
+      indent++;
 
       while (curtok) {
 
@@ -332,7 +390,8 @@ namespace lila {
         return nullptr;
       }
 
-      auto block = llvm::make_unique<BlockAST>(move(body));
+      auto block = llvm::make_unique<BlockAST>(move(body), indent);
+      indent--;
       return move(block);
     }
 

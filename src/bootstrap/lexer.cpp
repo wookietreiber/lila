@@ -13,6 +13,7 @@ namespace lila {
     unique_ptr<LexerResult> tokenize(basic_istream<char>* is) {
       auto tokens = llvm::make_unique<vector<unique_ptr<Token> > >();
 
+      unsigned int blocks = 0;
       unsigned int parens = 0;
       char c;
       is->get(c);
@@ -71,6 +72,23 @@ namespace lila {
           auto comma = llvm::make_unique<CommaToken>();
           tokens->push_back(move(comma));
           is->get(c);
+
+        } else if (c == '{') {
+          blocks++;
+          auto token = llvm::make_unique<BlockOpen>();
+          tokens->push_back(move(token));
+          is->get(c);
+
+        } else if (c == '}') {
+          if (blocks == 0) {
+            auto failure = llvm::make_unique<LexerFailure>("closing block when none is open");
+            return move(failure);
+          } else {
+            blocks--;
+            auto token = llvm::make_unique<BlockClose>();
+            tokens->push_back(move(token));
+            is->get(c);
+          }
 
         } else if (c == '(') {
           parens++;

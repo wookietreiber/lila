@@ -113,14 +113,21 @@ namespace lila {
     class BlockAST : public ExprAST {
     public:
       unique_ptr<vector<unique_ptr<ASTNode> > > body;
-      explicit BlockAST(unique_ptr<vector<unique_ptr<ASTNode> > > body) : body(move(body)) {}
+      int indent;
+      explicit BlockAST(unique_ptr<vector<unique_ptr<ASTNode> > > body, const int i) : body(move(body)) {
+        indent = i;
+      }
       string toString() {
         ostringstream oss;
         oss << '{' << endl;
         for (auto it = body->begin() ; it != body->end(); ++it) {
           ASTNode * ast = it->get();
-          oss << "  " << ast->toString() << endl;
+          for (int i = 0; i < indent; i++)
+            oss << "  ";
+          oss << ast->toString() << endl;
         }
+        for (int i = 0; i < indent - 1; i++)
+          oss << "  ";
         oss << '}' << endl;
         return oss.str();
       }

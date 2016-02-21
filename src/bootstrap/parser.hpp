@@ -44,6 +44,7 @@ namespace lila {
       Token * curtok;
       vector<unique_ptr<Token> >::size_type pos = 0;
       string error;
+      int indent = 0;
 
       int getPrecedence(string op) {
         int precedence = operatorPrecendences[op];
@@ -73,6 +74,7 @@ namespace lila {
       unique_ptr<ExprAST> parsePrimary();
       unique_ptr<ExprAST> parseBinOpRHS(unique_ptr<ExprAST> lhs, int prec);
       unique_ptr<ExprAST> parseIdentifier(string name);
+      unique_ptr<ExprAST> parseBlock();
       unique_ptr<ExprAST> parseTopLevelBlock();
       unique_ptr<ValueAST> parseValue();
       unique_ptr<DefAST> parseDef();

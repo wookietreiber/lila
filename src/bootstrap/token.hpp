@@ -36,6 +36,22 @@ namespace lila {
       }
     };
 
+    class BlockClose : public Token {
+    public:
+      explicit BlockClose() {}
+      string toString() {
+        return "}";
+      }
+    };
+
+    class BlockOpen : public Token {
+    public:
+      explicit BlockOpen() {}
+      string toString() {
+        return "{";
+      }
+    };
+
     class ParenClose : public Token {
     public:
       explicit ParenClose() {}
