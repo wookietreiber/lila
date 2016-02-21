@@ -300,15 +300,17 @@ namespace lila {
       return ast;
     }
 
-    unique_ptr<ExprAST> Parser::parseTopLevelBlock(unique_ptr<ASTNode> first) {
+    unique_ptr<ExprAST> Parser::parseTopLevelBlock() {
       auto body = llvm::make_unique<vector<unique_ptr<ASTNode> > >();
-      body->push_back(move(first));
 
       unique_ptr<ASTNode> curast;
 
-      while (nextToken()) {
+      while (curtok) {
+
         if (dynamic_cast<NewlineToken*>(curtok)) {
           continue;
+        } else if (dynamic_cast<DefToken*>(curtok)) {
+          curast = parseDef();
         } else if (dynamic_cast<ValueToken*>(curtok)) {
           curast = parseValue();
         } else {
@@ -318,8 +320,11 @@ namespace lila {
         if (curast) {
           body->push_back(move(curast));
         } else {
+          error = "error parsing top level block: " + error;
           return nullptr;
         }
+
+        nextToken();
       }
 
       if (!dynamic_cast<ExprAST*>(body->back().get())) {
@@ -338,19 +343,8 @@ namespace lila {
       while (nextToken()) {
         if (dynamic_cast<NewlineToken*>(curtok)) {
           continue;
-        } else if (dynamic_cast<DefToken*>(curtok)) {
-          auto ast = parseDef();
-          if (!ast) {
-            auto failure = llvm::make_unique<ParserFailure>(error);
-            return move(failure);
-          }
-          curast = parseTopLevelBlock(move(ast));
-        } else if (dynamic_cast<ValueToken*>(curtok)) {
-          auto ast = parseValue();
-          curast = parseTopLevelBlock(move(ast));
         } else {
-          auto ast = parseExpression();
-          curast = parseTopLevelBlock(move(ast));
+          curast = parseTopLevelBlock();
         }
 
         if (!curast) {

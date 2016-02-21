@@ -14,8 +14,9 @@ trap "rm -f $MEMCHECK_OUT" EXIT
 valgrind --tool=memcheck --leak-check=full --track-origins=yes --error-exitcode=1 \
 $LILAC -v -o /dev/null &> $MEMCHECK_OUT << EOF
 def foo = 2
+def bar(x, y) = x * y
 val a = 10 + 8 + foo
-val b = (a + 1) * foo
+val b = bar((a + 1), foo)
 b
 EOF
 
