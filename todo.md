@@ -7,6 +7,11 @@ start with small pieces.
 Pieces of this document will later be migrated to both a more technical specification and a more
 user-friendly documentation.
 
+Goals
+-----
+
+For the first stages focus on features that make code more readable without much magic.
+
 Features
 --------
 
