@@ -10,7 +10,17 @@ user-friendly documentation.
 Goals
 -----
 
-For the first stages focus on features that make code more readable without much magic.
+For the first stages focus on features that make code more readable without adding much magic,
+simply speaking: let the language and the compiler help you write better code wherever they can.
+
+In general the language should encourage:
+
+- readable code
+- expressive code
+- concise code
+- be productive / get things done quicker
+- to be explicit where necessary
+- use expressions over statements
 
 Features
 --------
@@ -18,14 +28,90 @@ Features
 The following originates from best practices and can be considered a wishlist of what I would
 like to see combined in a single programming language.
 
-- strong, static typing with type inference
+-   no semicolons
+
+    semicolons are visual noise, that distracts from what is actually important
+
+-   strong, static typing
+
+    is an easy way for you to get help by the compiler to avoid bugs
+
+-   ... with type inference
+
+    helps writing concise code, not mention the obvious, i.e.
+
+        val foo = "foo"
+
+    is obviously a `String` and in this case there is no need to redundantly specify that explicitly
+
+-   no (explicit) `null`
+
+    is there a technical reason for why `null` exists?
+
+    there are better ways of handling empty results, e.g. an `Option` type
+
+-   do not separate declaration from definition
+
+    having both means duplicating code and not being DRY
+
+-   default arguments
+
+        def log(x: Double, base: Double = E): Double
+        log(42)
+
+    type less when using defaults
+
+    avoid similar signatures, be DRY
+
+        def foo(a: Thing, b: Bippy) = ???
+        def foo(a: Thing) = foo(a, DefaultBippy)
+
+-   user-defined operator definitions
+
+    help grow a language with library functions, e.g. `BigDecimal`
+
+        class BigDecimal {
+          def +(other: BigDecimal) = ???
+        }
+
+-   ... with infix notation
+
+    can improve readability
+
+        this + that
+
+    vs
+
+        this.+(that)
+
+-   implicit parameters
+
+    keep code concise
+
+    helps with dependencies through the stack, e.g. if you are using concurrency you have a thread
+    pool, this can be handled as an implicit argument
+
+        implicit pool = ThreadPool(nThreads)
+        def parallel(foo: Foo)(implicit pool: ThreadPool) = ???
+        parallel(foo)
+
+-   named arguments
+
+    can make call site more readable
+
+        def foo(flag1: Boolean, flag2: Boolean) = ???
+        foo(flag1 = true, flag2 = false)
+
+-   pattern matching
+
+    avoid overly nested if constructs
+
+    organically decompose objects
+
 - expressions over statements, everything returns a value
 - immutable over mutable
-- infix notation
-- user-defined operator definitions
 - automatic memory management
 - first class functions
-- no `null`
 - typeclasses
 - small, yet extensible language, allow to do a lot as library
 - compiled to binary
@@ -34,7 +120,6 @@ like to see combined in a single programming language.
 - supports both low-level (machine-near) stuff as well as high-level abstractions
 - building high-level abstractions serves code organization, compiler should be able to deconstruct
   into low-level, no/low overhead machine code
-- implicit parameters
 - intelligent string interpolation
 
 Infrastructure
