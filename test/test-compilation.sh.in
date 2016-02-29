@@ -1,9 +1,9 @@
 #!/bin/bash
 
+export LILAC=../src/bootstrap/lilac
+
 function test_compilation {
   EXPECTED_RESULT=$1
-
-  LILAC=../src/bootstrap/lilac
 
   OBJECT=$(mktemp)
   LINKED=$(mktemp)
@@ -21,4 +21,8 @@ function test_compilation {
   else
     return 1
   fi
+}
+
+function test_compilation_fail {
+  $LILAC -v -o /dev/null
 }

@@ -12,6 +12,9 @@ namespace lila {
 
     unique_ptr<ExprAST> Parser::parseBlock() {
       auto body = llvm::make_unique<vector<unique_ptr<ASTNode> > >();
+      ostringstream oss;
+      oss << "anon" << anonindex++;
+      addScope(oss.str());
       unique_ptr<ASTNode> curast;
       indent++;
 
@@ -54,10 +57,12 @@ namespace lila {
         ExprAST * e = dynamic_cast<ExprAST*>(body->back().release());
         auto expr = unique_ptr<ExprAST>(e);
         indent--;
+        removeScope();
         return expr;
       } else {
         auto block = llvm::make_unique<BlockAST>(move(body), indent);
         indent--;
+        removeScope();
         return move(block);
       }
     }
@@ -156,10 +161,10 @@ namespace lila {
       } else if (dynamic_cast<ParenOpen*>(curtok)) {
         return parseParenExpr();
       } else if (auto t = dynamic_cast<OtherToken*>(curtok)) {
-        if (names.find(t->name) != names.end()) {
+        if (existsScopedValue(t->name)) {
           return parseIdentifier(t->name);
         } else {
-          error = "unknown token \"" + curtok->toString() + "\" when expecting primary";
+          error = "unknown identifier: " + curtok->toString();
           return nullptr;
         }
       } else {
@@ -254,13 +259,13 @@ namespace lila {
         return nullptr;
       }
 
-      if (names.find(name) != names.end()) {
+      if (existsScopedValue(name)) {
         error = name + " is already defined";
         return nullptr;
       }
 
       vector<string> emptyargs;
-      names[name] = emptyargs;
+      addScopedValue(name, emptyargs);
       auto ast = llvm::make_unique<ValueAST>(name, move(expr));
       return ast;
     }
@@ -274,11 +279,13 @@ namespace lila {
 
       if (auto t = dynamic_cast<OtherToken*>(curtok)) {
         name = t->name;
+        addScope(name);
 
-        if (names.find(name) != names.end()) {
+        if (existsScopedValue(name)) {
           error = name + " is already defined";
           return nullptr;
         }
+
       } else {
         error = "expected def name";
         return nullptr;
@@ -302,13 +309,13 @@ namespace lila {
             if (expectarg) {
               string name = t->name;
 
-              if (names.find(name) != names.end()) {
+              if (existsScopedValue(name)) {
                 error = name + " is already defined";
                 return nullptr;
               }
 
               vector<string> emptyargs;
-              names[name] = emptyargs;
+              addScopedValue(name, emptyargs);
 
               args.push_back(name);
               expectarg = false;
@@ -348,18 +355,22 @@ namespace lila {
         return nullptr;
       }
 
-      if (names.find(name) != names.end()) {
+      if (existsScopedValue(name)) {
         error = name + " is already defined";
         return nullptr;
       }
 
-      names[name] = args;
       auto ast = llvm::make_unique<DefAST>(name, args, move(expr));
+      removeScope();
+      addScopedValue(name, args);
       return ast;
     }
 
     unique_ptr<ExprAST> Parser::parseTopLevelBlock() {
       auto body = llvm::make_unique<vector<unique_ptr<ASTNode> > >();
+      ostringstream oss;
+      oss << "anon" << anonindex++;
+      addScope(oss.str());
       unique_ptr<ASTNode> curast;
       indent++;
 
@@ -392,6 +403,7 @@ namespace lila {
 
       auto block = llvm::make_unique<BlockAST>(move(body), indent);
       indent--;
+      removeScope();
       return move(block);
     }
 
@@ -413,6 +425,7 @@ namespace lila {
       }
 
       auto success = llvm::make_unique<ParserSuccess>(move(curast));
+
       return move(success);
     }
   }
