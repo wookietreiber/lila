@@ -13,6 +13,8 @@
 #include <sstream>
 #include <vector>
 
+#include "util.hpp"
+
 using namespace std;
 
 namespace lila {
@@ -73,13 +75,7 @@ namespace lila {
         oss << "def " << name;
 
         if (!args.empty()) {
-          oss << '(';
-          auto size = args.size();
-          for (unsigned i = 0; i < size; i++) {
-            oss << args[i];
-            if (i < (size - 1)) oss << ", ";
-          }
-          oss << ')';
+          oss << '(' << util::mkString(args, ", ") << ')';
         }
 
         oss << " = " << body->toString();

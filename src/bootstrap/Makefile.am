@@ -13,4 +13,6 @@ lilac_SOURCES = \
 	parser.hpp \
 	parser.cpp \
 	token.hpp \
+	util.hpp \
+	util.cpp \
 	lilac.cpp

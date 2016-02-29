@@ -12,6 +12,7 @@
 
 #include "ast.hpp"
 #include "lexer.hpp"
+#include "util.hpp"
 
 using namespace lila::ast;
 using namespace lila::lexer;
@@ -84,13 +85,7 @@ namespace lila {
       }
 
       string scopestr() {
-        ostringstream oss;
-        auto size = curscope.size();
-        for (unsigned i = 0; i < size; i++) {
-          oss << curscope[i];
-          if (i < (size - 1)) oss << '.';
-        }
-        return oss.str();
+        return util::mkString(curscope, ".");
       }
 
       void addScope(string level) {
