@@ -8,13 +8,13 @@ function test_compilation {
   OBJECT=$(mktemp)
   LINKED=$(mktemp)
 
-  trap "rm -f $OBJECT $LINKED" EXIT
-
   $LILAC -v -o $OBJECT
 
   @CC@ -o $LINKED $OBJECT
 
   RESULT=$($LINKED)
+
+  rm -f $OBJECT $LINKED
 
   if [[ $RESULT == $EXPECTED_RESULT ]] ; then
     return 0
