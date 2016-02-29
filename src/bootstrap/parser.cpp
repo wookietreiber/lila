@@ -259,7 +259,7 @@ namespace lila {
         return nullptr;
       }
 
-      if (existsScopedValue(name)) {
+      if (existsCurrentScope(name)) {
         error = name + " is already defined";
         return nullptr;
       }
@@ -281,7 +281,7 @@ namespace lila {
         name = t->name;
         addScope(name);
 
-        if (existsScopedValue(name)) {
+        if (existsCurrentScope(name)) {
           error = name + " is already defined";
           return nullptr;
         }
@@ -309,10 +309,11 @@ namespace lila {
             if (expectarg) {
               string name = t->name;
 
-              if (existsScopedValue(name)) {
-                error = name + " is already defined";
-                return nullptr;
-              }
+              for (auto it = args.begin() ; it != args.end(); ++it)
+                if (name == *it) {
+                  error = name + " is already defined as another argument";
+                  return nullptr;
+                }
 
               vector<string> emptyargs;
               addScopedValue(name, emptyargs);
@@ -352,11 +353,6 @@ namespace lila {
 
       if (!expr) {
         error = "expected expression: " + error;
-        return nullptr;
-      }
-
-      if (existsScopedValue(name)) {
-        error = name + " is already defined";
         return nullptr;
       }
 

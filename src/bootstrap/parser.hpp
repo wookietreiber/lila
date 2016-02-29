@@ -133,6 +133,15 @@ namespace lila {
         return false;
       }
 
+      bool existsCurrentScope(string name) {
+        vector<ParserValue> values = scoped_values[scopestr()];
+
+        for (auto it = values.begin() ; it != values.end(); ++it)
+          if (name == it->name) return true;
+
+        return false;
+      }
+
       unique_ptr<ExprAST> parseExpression();
       unique_ptr<ExprAST> parseNumberExpr(NumberToken* tok);
       unique_ptr<ExprAST> parseParenExpr();
