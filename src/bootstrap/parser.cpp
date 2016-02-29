@@ -375,8 +375,8 @@ namespace lila {
       indent++;
 
       while (curtok) {
-
         if (dynamic_cast<NewlineToken*>(curtok)) {
+          nextToken();
           continue;
         } else if (dynamic_cast<DefToken*>(curtok)) {
           curast = parseDef();
