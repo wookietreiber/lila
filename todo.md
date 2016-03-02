@@ -15,12 +15,13 @@ simply speaking: let the language and the compiler help you write better code wh
 
 In general the language should encourage:
 
-- readable code
-- expressive code
-- concise code
-- be productive / get things done quicker
+- to write readable code
+- to write expressive code
+- to write concise code
+- to be productive / get things done quicker
 - to be explicit where necessary
-- use expressions over statements
+- to use expressions over statements
+- to keep accidental complexity low
 
 Features
 --------
@@ -46,13 +47,13 @@ like to see combined in a single programming language.
 
 -   no (explicit) `null`
 
-    is there a technical reason for why `null` exists?
+    is there a technical reason for why `null` exists? I hope not. so don't repeat the billion dollar mistake. 
 
-    there are better ways of handling empty results, e.g. an `Option` type
+    there are better ways of handling empty results, e.g. an `Option` type. approaches like this should be used for FFI where `null` may be used.
 
 -   do not separate declaration from definition
 
-    having both means duplicating code and not being DRY
+    having both means duplicating code and not being DRY. also avoids `null`.
 
 -   default arguments
 
@@ -61,7 +62,7 @@ like to see combined in a single programming language.
 
     type less when using defaults
 
-    avoid similar signatures, be DRY
+    avoid similar function signatures, be DRY
 
         def foo(a: Thing, b: Bippy) = ???
         def foo(a: Thing) = foo(a, DefaultBippy)
