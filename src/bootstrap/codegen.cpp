@@ -23,11 +23,51 @@ namespace lila {
         return generateCodeCall(x);
       } else if (auto x = dynamic_cast<BinaryExprAST*>(ast)) {
         return generateCodeBinOp(x);
-      // TODO handle block with scopes
+      } else if (auto x = dynamic_cast<BlockAST*>(ast)) {
+        return generateCodeBlock(x);
       } else {
         error = "can't handle expression ast";
         return nullptr;
       }
+    }
+
+    llvm::Value* CodeGen::generateCodeBlock(BlockAST *ast) {
+      llvm::BasicBlock * prevInsertPoint = Builder.GetInsertBlock();
+      llvm::Value * lastExpr;
+
+      for (auto it = ast->body->begin() ; it != ast->body->end(); ++it) {
+        ASTNode * node = it->get();
+
+        if (auto x = dynamic_cast<ValueAST*>(node)) {
+          auto code = generateCodeValue(x);
+          if (!code) return 0;
+
+        } else if (auto x = dynamic_cast<DefAST*>(node)) {
+          generateCodeDef(x);
+          Builder.SetInsertPoint(prevInsertPoint);
+
+        } else if (auto x = dynamic_cast<NumberExprAST*>(node)) {
+          auto code = generateCodeNumber(x);
+          if (!code) return 0;
+          lastExpr = code;
+
+        } else if (auto x = dynamic_cast<BinaryExprAST*>(node)) {
+          auto code = generateCodeBinOp(x);
+          if (!code) return 0;
+          lastExpr = code;
+
+        } else if (auto x = dynamic_cast<CallAST*>(node)) {
+          auto code = generateCodeCall(x);
+          if (!code) return 0;
+          lastExpr = code;
+
+        } else {
+          error = "can't handle ast";
+          return 0;
+        }
+      }
+
+      return lastExpr;
     }
 
     llvm::Value* CodeGen::generateCodeBinOp(BinaryExprAST *ast) {
@@ -53,17 +93,25 @@ namespace lila {
     }
 
     llvm::Function * CodeGen::generateCodeDef(DefAST *ast) {
+      // add def name to scope
+      addScope(ast->name);
+
+      // argument types
       vector<llvm::Type*> args(ast->args.size(), llvm::Type::getDoubleTy(context));
-      llvm::FunctionType *funcType =
-        llvm::FunctionType::get(llvm::Type::getDoubleTy(context), args, false);
+
+      // return type
+      auto retType = llvm::Type::getDoubleTy(context);
+
+      // complete function type
+      llvm::FunctionType *funcType = llvm::FunctionType::get(retType, args, false);
 
       llvm::Function * func =
         llvm::Function::Create(funcType, llvm::Function::ExternalLinkage, ast->name, module.get());
 
       unsigned i = 0;
-      for (auto funcargs = func->arg_begin(); i != ast->args.size(); ++funcargs, ++i) {
-        funcargs->setName(ast->args[i]);
-        values[ast->args[i]] = funcargs;
+      for (auto funcarg = func->arg_begin(); i != ast->args.size(); ++funcarg, ++i) {
+        funcarg->setName(ast->args[i]);
+        addScopedValue(ast->args[i], funcarg);
       }
 
       llvm::BasicBlock *block = llvm::BasicBlock::Create(context, "entry", func);
@@ -80,6 +128,8 @@ namespace lila {
           return nullptr;
         }
 
+        // remove the def name scope
+        removeScope();
         return func;
       } else {
         func->eraseFromParent();
@@ -89,13 +139,17 @@ namespace lila {
     }
 
     llvm::Value * CodeGen::generateCodeValue(ValueAST *ast) {
+      addScope(ast->name);
       llvm::Value * exprCode = generateCodeExpr(ast->expr.get());
-      values[ast->name] = exprCode;
+      removeScope();
+
+      addScopedValue(ast->name, exprCode);
+
       return exprCode;
     }
 
     llvm::Value * CodeGen::generateCodeCall(CallAST *ast) {
-      if (auto value = values[ast->name]) {
+      if (auto value = findScopedValue(ast->name)) {
         return value;
       } else if (auto function = module->getFunction(ast->name)) {
         if (function->arg_size() != ast->args->size()) {
@@ -119,6 +173,9 @@ namespace lila {
     }
 
     int CodeGen::wrapTopLevelBlockInMain(BlockAST *ast) {
+      // add main to scope
+      addScope("main");
+
       vector<unique_ptr<ASTNode> > * body = ast->body.get();
 
       // generate void main()
@@ -188,6 +245,9 @@ namespace lila {
         error = "something wrong with auto-generated main function: " + verifyS;
         return 0;
       }
+
+      // remove the main scope
+      removeScope();
 
       return 1;
     }

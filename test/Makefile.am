@@ -1,6 +1,7 @@
 TESTS = \
 	lilac-def.sh \
 	lilac-parenless-def.sh \
+	lilac-scope.sh \
 	lilac-scope-fail.sh \
 	lilac-simple.sh \
 	lilac-top-level-block.sh \
