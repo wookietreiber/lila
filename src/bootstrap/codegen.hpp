@@ -107,7 +107,7 @@ namespace lila {
       llvm::Value * generateCodeValue(ValueAST *ast);
       llvm::Function * generateCodeDef(DefAST *ast);
 
-      int wrapTopLevelBlockInMain(BlockAST *ast);
+      bool wrapTopLevelBlockInMain(BlockAST *ast);
 
       unique_ptr<CodegenResult> generateCode(unique_ptr<ASTNode> ast);
     };

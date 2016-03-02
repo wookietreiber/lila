@@ -40,7 +40,7 @@ namespace lila {
 
         if (auto x = dynamic_cast<ValueAST*>(node)) {
           auto code = generateCodeValue(x);
-          if (!code) return 0;
+          if (!code) return nullptr;
 
         } else if (auto x = dynamic_cast<DefAST*>(node)) {
           generateCodeDef(x);
@@ -48,22 +48,22 @@ namespace lila {
 
         } else if (auto x = dynamic_cast<NumberExprAST*>(node)) {
           auto code = generateCodeNumber(x);
-          if (!code) return 0;
+          if (!code) return nullptr;
           lastExpr = code;
 
         } else if (auto x = dynamic_cast<BinaryExprAST*>(node)) {
           auto code = generateCodeBinOp(x);
-          if (!code) return 0;
+          if (!code) return nullptr;
           lastExpr = code;
 
         } else if (auto x = dynamic_cast<CallAST*>(node)) {
           auto code = generateCodeCall(x);
-          if (!code) return 0;
+          if (!code) return nullptr;
           lastExpr = code;
 
         } else {
           error = "can't handle ast";
-          return 0;
+          return nullptr;
         }
       }
 
@@ -172,7 +172,7 @@ namespace lila {
       }
     }
 
-    int CodeGen::wrapTopLevelBlockInMain(BlockAST *ast) {
+    bool CodeGen::wrapTopLevelBlockInMain(BlockAST *ast) {
       // add main to scope
       addScope("main");
 
@@ -194,7 +194,7 @@ namespace lila {
 
         if (auto x = dynamic_cast<ValueAST*>(node)) {
           auto code = generateCodeValue(x);
-          if (!code) return 0;
+          if (!code) return false;
 
         } else if (auto x = dynamic_cast<DefAST*>(node)) {
           generateCodeDef(x);
@@ -202,22 +202,22 @@ namespace lila {
 
         } else if (auto x = dynamic_cast<NumberExprAST*>(node)) {
           auto code = generateCodeNumber(x);
-          if (!code) return 0;
+          if (!code) return false;
           lastExpr = code;
 
         } else if (auto x = dynamic_cast<BinaryExprAST*>(node)) {
           auto code = generateCodeBinOp(x);
-          if (!code) return 0;
+          if (!code) return false;
           lastExpr = code;
 
         } else if (auto x = dynamic_cast<CallAST*>(node)) {
           auto code = generateCodeCall(x);
-          if (!code) return 0;
+          if (!code) return false;
           lastExpr = code;
 
         } else {
           error = "can't handle ast";
-          return 0;
+          return false;
         }
       }
 
@@ -243,13 +243,13 @@ namespace lila {
       if (verifyFunction(*mainFunc, &verifyE)) {
         mainFunc->eraseFromParent();
         error = "something wrong with auto-generated main function: " + verifyS;
-        return 0;
+        return false;
       }
 
       // remove the main scope
       removeScope();
 
-      return 1;
+      return true;
     }
 
     unique_ptr<CodegenResult> CodeGen::generateCode(unique_ptr<ASTNode> ast) {
