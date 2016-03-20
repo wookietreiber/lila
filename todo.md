@@ -85,6 +85,17 @@ like to see combined in a single programming language.
 
         this.+(that)
 
+-   avoid useless use of for loops:
+
+        for (i in 0 until array.size)
+          array(i) = array(i) * 2
+
+    can be avoided with functional programming
+
+        array.map(_ * 2)
+
+    can even be re-written by the compiler to a low-level loop, so there are no performance implications
+
 -   implicit parameters
 
     keep code concise
