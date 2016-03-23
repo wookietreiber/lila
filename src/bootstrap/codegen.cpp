@@ -221,7 +221,7 @@ namespace lila {
         }
       }
 
-      llvm::Value *fmt = Builder.CreateGlobalStringPtr("%f\n");
+      llvm::Value *fmt = Builder.CreateGlobalStringPtr("%lg\n");
 
       vector<llvm::Type *> putsArgs;
       putsArgs.push_back(Builder.getInt8Ty()->getPointerTo());
