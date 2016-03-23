@@ -85,6 +85,10 @@ like to see combined in a single programming language.
 
         this.+(that)
 
+-   zero or one based indexing? is indexing even required? differentiate library / application?
+
+-   standard library collections: no inefficient operations, e.g. indexing linear sequences
+
 -   avoid useless use of for loops:
 
         for (i in 0 until array.size)
