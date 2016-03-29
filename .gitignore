@@ -1,12 +1,49 @@
-aclocal.m4
-missing
-install-sh
+# created by autoscan
+
+/autom4te.cache
+/autoscan.log
+/configure.scan
+
+# created by autoreconf -fi (includes autoconf, automake, libtool)
+
+/aclocal.m4
+/autom4te.cache
+/compile
+/config.guess
+/config.h.in*
+/config.sub
+/configure
+/depcomp
+/install-sh
+/ltmain.sh
+/missing
+/test-driver
 Makefile.in
-autoscan.log
-compile
-configure
-depcomp
-config.h.in
-autom4te.cache/
-configure.scan
-test-driver
+
+# created by configure
+
+/config.h
+/config.log
+/config.status
+/libtool
+/stamp-h1
+Makefile
+.deps
+
+# created by make
+
+*.la
+*.lo
+*.o
+*.tar.*
+.libs
+
+# created by make check
+
+/test/*.log
+/test/*.trs
+
+# project-specific
+
+/test/test-compilation.sh
+lilac
