@@ -76,6 +76,14 @@ namespace lila {
       }
     };
 
+    class DotToken : public Token {
+    public:
+      explicit DotToken() {}
+      string toString() {
+        return ".";
+      }
+    };
+
     class ValueToken : public Token {
     public:
       explicit ValueToken() {}

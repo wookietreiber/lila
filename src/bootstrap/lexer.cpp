@@ -46,8 +46,8 @@ namespace lila {
             //     5.abs
             //   number.method(args), e.g.:
             //     5.max(6)
-            auto dotToken = llvm::make_unique<OtherToken>(".");
-            tokens->push_back(move(dotToken));
+            auto token = llvm::make_unique<DotToken>();
+            tokens->push_back(move(token));
           }
 
         } else if (isalpha(c)) { // [a-zA-Z][a-zA-Z0-9]* token
