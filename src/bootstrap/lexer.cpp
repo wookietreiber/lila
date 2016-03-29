@@ -117,6 +117,9 @@ namespace lila {
           if (str.compare("=") == 0) {
             auto assignmentToken = llvm::make_unique<AssignmentToken>();
             tokens->push_back(move(assignmentToken));
+          } else if (str.compare(":") == 0) {
+            auto token = llvm::make_unique<ColonToken>();
+            tokens->push_back(move(token));
           } else {
             auto otherToken = llvm::make_unique<OtherToken>(str);
             tokens->push_back(move(otherToken));

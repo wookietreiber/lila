@@ -84,6 +84,14 @@ namespace lila {
       }
     };
 
+    class ColonToken : public Token {
+    public:
+      explicit ColonToken() {}
+      string toString() {
+        return ":";
+      }
+    };
+
     class ValueToken : public Token {
     public:
       explicit ValueToken() {}
