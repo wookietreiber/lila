@@ -1,5 +1,5 @@
 /*            __ __                                                     *\
-**     __    /_// /  ___            lila compiler API                   **
+**     __    /_// /  ___            lila bootstrap compiler             **
 **    / /   __ / /  / _ |           (c) 2016, Christian Krause          **
 **   / /__ / // /__/ __ |                                               **
 **  /____//_//____/_/ | |                                               **
