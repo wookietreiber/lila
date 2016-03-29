@@ -36,8 +36,8 @@ namespace lila {
           }
 
           double value = strtod(number.c_str(), nullptr);
-          auto numberToken = llvm::make_unique<NumberToken>(value);
-          tokens->push_back(move(numberToken));
+          auto token = llvm::make_unique<NumberToken>(value);
+          tokens->push_back(move(token));
 
           // check if last char of number is a dot ...
           if (number.back() == '.') {
@@ -61,16 +61,16 @@ namespace lila {
             auto token = llvm::make_unique<DefToken>();
             tokens->push_back(move(token));
           } else if (str.compare("val") == 0) {
-            auto valueToken = llvm::make_unique<ValueToken>();
-            tokens->push_back(move(valueToken));
+            auto token = llvm::make_unique<ValueToken>();
+            tokens->push_back(move(token));
           } else {
-            auto otherToken = llvm::make_unique<OtherToken>(str);
-            tokens->push_back(move(otherToken));
+            auto token = llvm::make_unique<OtherToken>(str);
+            tokens->push_back(move(token));
           }
 
         } else if (c == ',') {
-          auto comma = llvm::make_unique<CommaToken>();
-          tokens->push_back(move(comma));
+          auto token = llvm::make_unique<CommaToken>();
+          tokens->push_back(move(token));
           is->get(c);
 
         } else if (c == '{') {
@@ -92,8 +92,8 @@ namespace lila {
 
         } else if (c == '(') {
           parens++;
-          auto parenopen = llvm::make_unique<ParenOpen>();
-          tokens->push_back(move(parenopen));
+          auto token = llvm::make_unique<ParenOpen>();
+          tokens->push_back(move(token));
           is->get(c);
 
         } else if (c == ')') {
@@ -102,8 +102,8 @@ namespace lila {
             return move(failure);
           } else {
             parens--;
-            auto parenclose = llvm::make_unique<ParenClose>();
-            tokens->push_back(move(parenclose));
+            auto token = llvm::make_unique<ParenClose>();
+            tokens->push_back(move(token));
             is->get(c);
           }
 
@@ -115,14 +115,14 @@ namespace lila {
             str += c;
 
           if (str.compare("=") == 0) {
-            auto assignmentToken = llvm::make_unique<AssignmentToken>();
-            tokens->push_back(move(assignmentToken));
+            auto token = llvm::make_unique<AssignmentToken>();
+            tokens->push_back(move(token));
           } else if (str.compare(":") == 0) {
             auto token = llvm::make_unique<ColonToken>();
             tokens->push_back(move(token));
           } else {
-            auto otherToken = llvm::make_unique<OtherToken>(str);
-            tokens->push_back(move(otherToken));
+            auto token = llvm::make_unique<OtherToken>(str);
+            tokens->push_back(move(token));
           }
 
         } else if (c == '\n') {
