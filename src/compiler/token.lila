@@ -1,0 +1,31 @@
+/*            __ __                                                     *\
+**     __    /_// /  ___            lila compiler API                   **
+**    / /   __ / /  / _ |           (c) 2016, Christian Krause          **
+**   / /__ / // /__/ __ |                                               **
+**  /____//_//____/_/ | |                                               **
+\*                    |/                                                */
+
+package lila.compiler
+
+sealed abstract class Token
+
+object Token {
+  case class Number(value: Double) extends Token
+  case class Other(name: String) extends Token
+
+  case object BlockOpen extends Token
+  case object BlockClose extends Token
+
+  case object ParenOpen extends Token
+  case object ParenClose extends Token
+
+  case object Comma extends Token
+  case object Colon extends Token
+  case object Dot extends Token
+  case object Assignment extends Token
+
+  case object Def extends Token
+  case object Value extends Token
+
+  case object Newline extends Token
+}
