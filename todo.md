@@ -1,17 +1,14 @@
 Overview
 ========
 
-This document contains what I want to achieve with this language. The goals are high, but I will
-start with small pieces.
+This document contains what I would like to achieve with this language.
 
-Pieces of this document will later be migrated to both a more technical specification and a more
-user-friendly documentation.
+Pieces of this document will later be migrated to both a more technical specification and a more user-friendly documentation.
 
 Goals
 -----
 
-For the first stages focus on features that make code more readable without adding much magic,
-simply speaking: let the language and the compiler help you write better code wherever they can.
+For the first stages focus on features that make code more readable without adding much magic, simply speaking: let the language and the compiler help you write better code wherever they can.
 
 In general the language should encourage:
 
@@ -26,12 +23,30 @@ In general the language should encourage:
 Features
 --------
 
-The following originates from best practices and can be considered a wishlist of what I would
-like to see combined in a single programming language.
+The following originates from best practices and can be considered a wishlist of what I would like to see combined in a single programming language.
 
 -   no semicolons
 
-    semicolons are visual noise, that distracts from what is actually important
+    Semicolons are visual noise that distracts from what is actually important, especially when reading code.
+
+-   allow the programmer to not name things
+
+        numbers.map(number => number * 2)
+
+    is unnecessarily verbose when compared to
+
+        numbers.map(_ * 2)
+
+-   avoid useless use of for loops:
+
+        for (i in 0 until array.size)
+          numbers(i) = numbers(i) * 2
+
+    can be avoided with functional programming
+
+        array.map(_ * 2)
+
+    can even be re-written by the compiler to a low-level loop, so there are no performance implications
 
 -   strong, static typing
 
@@ -85,20 +100,9 @@ like to see combined in a single programming language.
 
         this.+(that)
 
--   zero or one based indexing? is indexing even required? differentiate library / application?
+-   zero or one based indexing? is indexing even required (in higher level abstractions)? differentiate library / application?
 
 -   standard library collections: no inefficient operations, e.g. indexing linear sequences
-
--   avoid useless use of for loops:
-
-        for (i in 0 until array.size)
-          array(i) = array(i) * 2
-
-    can be avoided with functional programming
-
-        array.map(_ * 2)
-
-    can even be re-written by the compiler to a low-level loop, so there are no performance implications
 
 -   implicit parameters
 
@@ -131,7 +135,7 @@ like to see combined in a single programming language.
 - typeclasses
 - small, yet extensible language, allow to do a lot as library
 - compiled to binary
-- scales from interpreted scripts (`#!/usr/bin/env lila`) to large projects
+- scales from interpreted scripts (shebang) to large projects
 - repl
 - supports both low-level (machine-near) stuff as well as high-level abstractions
 - building high-level abstractions serves code organization, compiler should be able to deconstruct
