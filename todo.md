@@ -1,35 +1,35 @@
 Overview
 ========
 
-This document contains what I would like to achieve with this language.
+This document contains what I would like to achieve with this programming language.
 
-Pieces of this document will later be migrated to both a more technical specification and a more user-friendly documentation.
+**Note:** Later, once features are implemented, this document will be moved piece by piece to both a more technical specification and a more user-friendly documentation.
 
 Goals
------
+=====
 
-For the first stages focus on features that make code more readable without adding much magic, simply speaking: let the language and the compiler help you write better code wherever they can.
+In general, the language should encourage:
 
-In general the language should encourage:
+- to write **readable** code
+- to write **expressive** code
+- to write **concise** code
+- to be **explicit** when necessary, i.e. it helps clarity, readability and understanding of the code
+- to **avoid accidental code complexity** and **avoid code smells**
 
-- to write readable code
-- to write expressive code
-- to write concise code
-- to be productive / get things done quicker
-- to be explicit where necessary
-- to use expressions over statements
-- to keep accidental complexity low
+**Note:** For the first stages the focus should be on features that make code more readable without adding much magic, simply speaking: let the language and the compiler help you write *better* code wherever they can.
 
-Features
---------
+**Note:** (mainly to myself) These goals should all be high-level and contain no technical details, i.e. what is supposed to be achieved without immediately relying on technical details.
 
-The following originates from best practices and can be considered a wishlist of what I would like to see combined in a single programming language.
+Language Features
+=================
 
--   no semicolons
+The following is a list of features I know about that will support the above-mentioned goals.
 
-    Semicolons are visual noise that distracts from what is actually important, especially when reading code.
+-   **no semicolons**
 
--   allow the programmer to not name things
+    Semicolons are *visual noise* that distracts from what is actually important, especially when reading code.
+
+-   **allow the programmer to not name things**
 
         numbers.map(number => number * 2)
 
@@ -37,52 +37,63 @@ The following originates from best practices and can be considered a wishlist of
 
         numbers.map(_ * 2)
 
--   avoid useless use of for loops:
+-   **avoid useless use of for loops**
 
         for (i in 0 until array.size)
           numbers(i) = numbers(i) * 2
 
     can be avoided with functional programming
 
-        array.map(_ * 2)
+        numbers.map(_ * 2)
 
     can even be re-written by the compiler to a low-level loop, so there are no performance implications
 
--   strong, static typing
+-   **strong, static typing**
 
     is an easy way for you to get help by the compiler to avoid bugs
 
--   ... with type inference
+-   ... coupled with **type inference**
 
-    helps writing concise code, not mention the obvious, i.e.
+    helps keep writing concise code and not mention the obvious, e.g.
+
+        val foo: String = "foo"
+
+    `foo` is obviously a `String` and in this case there should be no need to specify that explicitly
 
         val foo = "foo"
 
-    is obviously a `String` and in this case there is no need to redundantly specify that explicitly
+-   **no (explicit) `null`**
 
--   no (explicit) `null`
+    As far as I know, there is no technical reason for why `null` exists. Do not repeat the billion dollar mistake. 
 
-    is there a technical reason for why `null` exists? I hope not. so don't repeat the billion dollar mistake. 
+    Also, there are better ways of handling empty results, e.g. an `Option` type. Approaches like this should always be used for FFIs to languages where `null` may be used.
 
-    there are better ways of handling empty results, e.g. an `Option` type. approaches like this should be used for FFI where `null` may be used.
+-   **do not separate declaration from definition**
 
--   do not separate declaration from definition
+    Having both means duplicating code and not being DRY. It also removes the need for `null` as an initializer.
 
-    having both means duplicating code and not being DRY. also avoids `null`.
+-   **named arguments**
 
--   default arguments
+    can make call site more readable
 
-        def log(x: Double, base: Double = E): Double
+        def foo(flag1: Boolean, flag2: Boolean) = ???
+        foo(flag1 = true, flag2 = false)
+
+-   **default arguments**
+
+    Allows you to write less when using sane defaults.
+
+        def log(x: Double, base: Double = E): Double = ???
         log(42)
 
-    type less when using defaults
+    Also, it removes the need for similar function signatures:
 
-    avoid similar function signatures, be DRY
+        def log(x: Double, base: Double): Double = ???
+        def ln(x: Double) = log(x, base = E)
 
-        def foo(a: Thing, b: Bippy) = ???
-        def foo(a: Thing) = foo(a, DefaultBippy)
+    DRY.
 
--   user-defined operator definitions
+-   **user-defined operator definitions**
 
     help grow a language with library functions, e.g. `BigDecimal`
 
@@ -90,43 +101,40 @@ The following originates from best practices and can be considered a wishlist of
           def +(other: BigDecimal) = ???
         }
 
--   ... with infix notation
+-   ... coupled with **infix notation**
 
     can improve readability
 
         this + that
 
-    vs
+    instead of
 
         this.+(that)
 
--   zero or one based indexing? is indexing even required (in higher level abstractions)? differentiate library / application?
-
--   standard library collections: no inefficient operations, e.g. indexing linear sequences
-
--   implicit parameters
-
-    keep code concise
-
-    helps with dependencies through the stack, e.g. if you are using concurrency you have a thread
-    pool, this can be handled as an implicit argument
-
-        implicit pool = ThreadPool(nThreads)
-        def parallel(foo: Foo)(implicit pool: ThreadPool) = ???
-        parallel(foo)
-
--   named arguments
-
-    can make call site more readable
-
-        def foo(flag1: Boolean, flag2: Boolean) = ???
-        foo(flag1 = true, flag2 = false)
-
--   pattern matching
+-   **pattern matching**
 
     avoid overly nested if constructs
 
     organically decompose objects
+
+-   **implicit parameters**
+
+    keep code concise
+
+    helps with dependencies through the stack, e.g. if you are using concurrency you have a thread pool, this can be handled as an implicit argument
+
+        implicit val pool = ThreadPool(nThreads)
+        def parallel(foo: Foo)(implicit pool: ThreadPool) = ???
+        parallel(foo)
+
+Design Choices
+==============
+
+-   zero or one based indexing?
+
+    is indexing even required (in higher-level abstractions)? differentiate library / application?
+
+-   standard library collections: no inefficient operations, e.g. indexing linear sequences
 
 - expressions over statements, everything returns a value
 - immutable over mutable
@@ -138,54 +146,39 @@ The following originates from best practices and can be considered a wishlist of
 - scales from interpreted scripts (shebang) to large projects
 - repl
 - supports both low-level (machine-near) stuff as well as high-level abstractions
-- building high-level abstractions serves code organization, compiler should be able to deconstruct
-  into low-level, no/low overhead machine code
+- building high-level abstractions serves code organization, compiler should be able to deconstruct into low-level, no/low overhead machine code
 - intelligent string interpolation
 
 Infrastructure
---------------
+==============
 
-### Program: lila
+## Program: lila
 
 - interactive interpreter (repl)
 - interpreter for scripts with shebang `#!/usr/bin/env lila`
 
-### Program: lilac
+## Program: lilac
 
 - compiler
-- linker
-
-### Linking
-
-- `-c` option to compile only, not link
-- also link without a `-c` option
-- native linker vs llvm linker
-- `-l` option, `LDFLAGS`
-- `-L` option, `LD_LIBRARY_PATH`
 
 Syntax Sucks
-------------
+============
 
-Everyone likes to read code in a different way. Some prefer `fun` for function definitions, some
-`def`. Some prefer tabs, some prefer two or four spaces.
+Everyone likes to read code in a different way. Some prefer `fun` for function definitions, some `def`. Some prefer tabs, some prefer two or four spaces.
 
-A reasonably intelligent code formatter/editor should be able to display the code the way you like,
-not the way the language designer thought was best or the code author wanted it to look like. There
-may very well be a default that is used for documentation, although even there a reasonably well
-designed web page can render in your personal preference.
+A reasonably intelligent code formatter/editor should be able to display the code the way you like, not the way the language designer thought was best or the code author wanted it to look like. This also keeps how the code looks consistent. There may very well be a default that is used for documentation, although a reasonably well designed web page can render the code in your personal preference.
 
-Allowing multiple keywords is no problem to me. Keywords are rare and common enough to not be used
-as identifiers anyway.
+Allowing multiple keywords is no problem to me. Keywords are rare and common enough to not be used as identifiers anyway.
 
-### Semicolons
+## Semicolons
 
 Semicolons are optional. The compiler can figure out when an expression ends.
 
-### Spaces or Tabs
+## Spaces or Tabs
 
 Spaces versus tabs is one of the most stupid discussions ever.
 
-### Definitions
+## Definitions
 
 `val foo = ...` is the same as `let foo = ...`.
 
@@ -193,25 +186,25 @@ Spaces versus tabs is one of the most stupid discussions ever.
 
 `def foo = ...` is the same as `fn foo = ...` is the same as `fun foo = ...`.
 
-### Calling Methods
+## Calling Methods
 
 `Foo.run()` is the same as `Foo::run()`.
 
-### Creating Things / Constructor
+## Creating Things / Constructor
 
 `new Foo()` is the same as `Foo::new()`.
 
-### Camel vs Underscores
+## Camel vs Underscores
 
 `Foo.doStuff()` is the same as `Foo::do_stuff()`.
 
-### Namespacing
+## Namespacing
 
 `import stuff`, `include stuff` and `use stuff` are all the same.
 
 Also, `import stuff.util` is the same as `import stuff::util`.
 
-### Comments
+## Comments
 
 All of these are comments:
 
@@ -221,7 +214,7 @@ All of these are comments:
 
     /* foo comment */
 
-### Using Methods / Functions
+## Using Methods / Functions
 
 Both add the `add` method to `Thing`:
 
@@ -231,8 +224,7 @@ Both add the `add` method to `Thing`:
       def add(number: Int)
     }
 
-They can both be used as `add(thing, number)`, `thing.add(number)` and with infix notation
-`thing add number`.
+They can both be used as `add(thing, number)`, `thing.add(number)` and, with infix notation, `thing add number`.
 
 ## Returning Multiple Values
 
