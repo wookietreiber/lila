@@ -39,7 +39,7 @@ The following is a list of features I know about that will support the above-men
 
 -   **avoid useless use of for loops**
 
-        for (i in 0 until array.size)
+        for (i in 0 until numbers.size)
           numbers(i) = numbers(i) * 2
 
     can be avoided with functional programming
@@ -70,7 +70,19 @@ The following is a list of features I know about that will support the above-men
 
 -   **do not separate declaration from definition**
 
-    Having both means duplicating code and not being DRY. It also removes the need for `null` as an initializer.
+    It removes the need for `null` as an initializer. To me, it seems like very old imperative style, where you needed to write e.g.
+
+        int a;
+        
+        if (expr) {
+          a = 1;
+        } else {
+          a = 2;
+        }
+
+    instead of being able to write
+
+        val a = if (expr) 1 else 2
 
 -   **named arguments**
 
